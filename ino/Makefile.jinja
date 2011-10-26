@@ -1,3 +1,47 @@
 
-all:
-	echo 'hello'
+CC=avr-gcc
+CXX=avr-g++
+CFLAGS=-ffunction-sections -fdata-sections -g -gstabs -Os -Wl,--gc-sections -mmcu=atmega328p -DF_CPU=16000000 -DARDUINO=22 -lm -I{{ env.arduino_core_dir }}
+OBJCOPY=avr-objcopy
+AR=avr-ar
+BDIR=.build
+BDIR_CORE=$(BDIR)/core
+BDIR_CORE_LIB=$(BDIR_CORE)/{{ 'core'|libname }}
+
+$(BDIR_CORE):
+	mkdir -p $(BDIR)/core
+
+# core library .c -> objects (.o)
+{% for file in env.arduino_core_dir|glob('*.c') -%}
+$(BDIR_CORE)/{{ file|objname }} : {{ env.arduino_core_dir|pjoin(file) }} $(DBIR_CORE)
+	$(CC) $(CFLAGS) -c {{ env.arduino_core_dir|pjoin(file) }} -o $@
+{% endfor -%}
+
+# core library .cpp -> objects (.o)
+{% for file in env.arduino_core_dir|glob('*.cpp') -%}
+$(BDIR_CORE)/{{ file|objname }} : {{ env.arduino_core_dir|pjoin(file) }} $(DBIR_CORE)
+	$(CXX) $(CFLAGS) -c {{ env.arduino_core_dir|pjoin(file) }} -o $@
+{% endfor -%}
+
+# core lib objects -> archive (.a)
+$(BDIR_CORE_LIB) : {% for file in env.arduino_core_dir|glob('*.c', '*.cpp') %}$(BDIR_CORE)/{{ file|objname }} {% endfor %}
+	$(AR) rcs $@ \
+		{% for file in env.arduino_core_dir|glob('*.c', '*.cpp') -%}
+			$(BDIR_CORE)/{{ file|objname }}{% if not loop.last %} \{% endif %}
+		{% endfor %}
+
+.build/sketch.cpp : src/sketch.pde
+	echo '#include <WProgram.h>' > .build/sketch.cpp
+	cat src/sketch.pde >> .build/sketch.cpp
+
+.build/sketch.o : .build/sketch.cpp
+	$(CC) $(CFLAGS) -o .build/sketch.o -c .build/sketch.cpp
+
+.build/firmware.elf : .build/sketch.o $(BDIR_CORE_LIB)
+	$(CC) -o .build/firmware.elf .build/sketch.o $(BDIR_CORE_LIB)
+
+.build/firmware.hex : .build/firmware.elf
+	$(OBJCOPY) -O ihex -R .eeprom .build/firmware.elf .build/firmware.hex
+
+all : .build/firmware.hex
+

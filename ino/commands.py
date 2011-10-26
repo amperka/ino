@@ -4,6 +4,7 @@ import os.path
 import shutil
 import jinja2
 import subprocess
+import fnmatch
 
 
 class Command(object):
@@ -79,13 +80,41 @@ class Init(Command):
             raise CommandError(str(e))
 
 
+def glob_filter(dir, *patterns):
+    result = []
+    for f in os.listdir(dir):
+        if any(fnmatch.fnmatch(f, p) for p in patterns):
+            result.append(f)
+    return result
+
+def pjoin_filter(base, *parts):
+    return os.path.join(base, *parts)
+
+
+def objname_filter(filepath):
+    basename, _ = os.path.splitext(filepath)
+    return basename + '.o'
+
+
+def libname_filter(filepath):
+    head, tail = os.path.split(filepath)
+    basename, _ = os.path.splitext(tail)
+    return os.path.join(head, 'lib%s.a' % basename)
+
+
 @command('build')
 class Build(Command):
     def setup_arg_parser(self, parser):
         parser.add_argument('-t', '--template', help='Jinja makefile template to use')
 
     def run(self, args):
+        self.env['arduino_core_dir'] = '/usr/local/share/arduino/hardware/arduino/cores/arduino'
+
         jinja_env = jinja2.Environment()
+        jinja_env.filters['glob'] = glob_filter
+        jinja_env.filters['pjoin'] = pjoin_filter
+        jinja_env.filters['objname'] = objname_filter
+        jinja_env.filters['libname'] = libname_filter
         template = args.template or os.path.join(os.path.dirname(__file__), 'Makefile.jinja')
         with open(template) as f:
             template = jinja_env.from_string(f.read())
@@ -93,7 +122,9 @@ class Build(Command):
         makefile_path = os.path.join(self.env['build_dir'], 'Makefile')
         with open(makefile_path, 'wt') as f:
             f.write(makefile_contents)
-        p = subprocess.Popen(['make', '-f', makefile_path])
+
+        p = subprocess.Popen(['make', '-f', makefile_path, 'all'])
+        p.communicate()
 
 
 @command('upload')
