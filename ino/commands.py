@@ -2,6 +2,8 @@
 
 import os.path
 import shutil
+import jinja2
+import subprocess
 
 
 class Command(object):
@@ -83,10 +85,15 @@ class Build(Command):
         parser.add_argument('-t', '--template', help='Jinja makefile template to use')
 
     def run(self, args):
-        if 'avr-gcc' not in self.env:
-            self.env['avr-gcc'] = self.find_program('avr-gcc')
-        render_template(args.template, env=env)
-        run('make')
+        jinja_env = jinja2.Environment()
+        template = args.template or os.path.join(os.path.dirname(__file__), 'Makefile.jinja')
+        with open(template) as f:
+            template = jinja_env.from_string(f.read())
+        makefile_contents = template.render(env=self.env)
+        makefile_path = os.path.join(self.env['build_dir'], 'Makefile')
+        with open(makefile_path, 'wt') as f:
+            f.write(makefile_contents)
+        p = subprocess.Popen(['make', '-f', makefile_path])
 
 
 @command('upload')
