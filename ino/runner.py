@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8; -*-
 
+import os.path
 import argparse
 import inspect
 
 import ino.commands
 
 
-class Environment(object):
-    pass
+class Environment(dict):
+    def __init__(self, *args, **kwargs):
+        super(Environment, self).__init__()
+        self['templates_dir'] = os.path.join(os.path.dirname(__file__), '..', 'templates')
 
 
 def main():
