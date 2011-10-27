@@ -84,4 +84,4 @@ class Build(Command):
         with open(makefile_path, 'wt') as f:
             f.write(makefile_contents)
 
-        p = subprocess.Popen(['make', '-f', makefile_path, 'all'])
+        subprocess.call(['make', '-f', makefile_path, 'all'])

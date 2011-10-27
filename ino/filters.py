@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import sys
 import os.path
 import fnmatch
 import functools
@@ -59,3 +60,24 @@ def libname(filepath):
 def filemap(sources, target_dir, rename_rule):
     return FileMap((source, GlobFile(xname(source, rename_rule), target_dir)) 
                    for source in sources)
+
+
+@filter
+def colorize(s, color):
+    if not sys.stdout.isatty():
+        return s
+
+    ccodes = {
+        'cyan':     '96',
+        'purple':   '95',
+        'blue':     '94',
+        'green':    '92',
+        'yellow':   '93',
+        'red':      '91',
+    }
+
+    return ''.join([
+        '\033[', ccodes[color], 'm', 
+        s,
+        '\033[0m'
+    ])

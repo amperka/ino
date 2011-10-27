@@ -5,8 +5,9 @@
 {% macro compile_c(filemap) %}
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
-	mkdir -p {{ target.dirname }}
-	{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
+	@echo {{ source.filename|colorize('yellow') }}
+	@mkdir -p {{ target.dirname }}
+	@{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
 
@@ -16,8 +17,9 @@
 {% macro compile_cpp(filemap) %}
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
-	mkdir -p {{ target.dirname }}
-	{{ e.cxx }} {{ e.cflags }} {{ e.cxxflags }} -o $@ -c {{ source.path }}
+	@echo {{ source.filename|colorize('yellow') }}
+	@mkdir -p {{ target.dirname }}
+	@{{ e.cxx }} {{ e.cflags }} {{ e.cxxflags }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
 
@@ -38,7 +40,8 @@
 {{ compile_c(c) }}
 {{ compile_cpp(cpp) }}
 {{ libpath }} : {{ libobjs }}
-	{{ e.ar }} rcs $@ {{ libobjs }}
+	@echo {{ ('Linking ' ~ name|libname) |colorize('green') }}
+	@{{ e.ar }} rcs $@ {{ libobjs }}
 {% do add_to.append(libpath) %}
 {% endmacro %}
 
@@ -54,8 +57,8 @@
 {% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
 {% for source, target in pde.iterpaths() %}
 {{ target }} : {{ source }}
-	echo '#include <WProgram.h>' > $@
-	cat {{ source }} >> $@
+	@echo '#include <WProgram.h>' > $@
+	@cat {{ source }} >> $@
 {% endfor %}
 
 {#
@@ -76,14 +79,16 @@
 {% set objs = c.target_paths() + cpp.target_paths() + libs %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
-	{{ e.cc }} {{ e.elfflags }} -o $@ {{ objs }} -lm
+	@echo {{ ('Linking firmware.elf') |colorize('green') }}
+	@{{ e.cc }} {{ e.elfflags }} -o $@ {{ objs }} -lm
 
 {#
  #   elf -> hex
  #}
 {% set hex = e.build_dir|pjoin('firmware.hex') %}
 {{ hex }} : {{ elf }}
-	{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
+	@echo {{ ('Converting to firmware.hex') |colorize('green') }}
+	@{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
 
 all : {{ hex }}
 

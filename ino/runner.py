@@ -9,6 +9,7 @@ import inspect
 import ino.commands
 
 from ino.commands.base import Command, CommandError
+from ino.filters import colorize
 
 
 class Environment(dict):
@@ -38,7 +39,7 @@ def main():
     try:
         args.func(args)
     except CommandError as e:
-        print e
+        print colorize(str(e), 'red')
         sys.exit(1)
 
 
