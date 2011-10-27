@@ -20,10 +20,7 @@ class Build(Command):
 
     def setup_arg_parser(self, parser):
         self.e.add_board_model_arg(parser)
-
-        parser.add_argument('-d', '--arduino-dist', metavar='PATH',
-                            help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
-
+        self.e.add_arduino_dist_arg(parser)
         parser.add_argument('-t', '--template', 
                             help='Jinja2 makefile template to use.\nUse built-in default if not specified')
 

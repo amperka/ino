@@ -2,6 +2,7 @@
 
 import os.path
 import itertools
+import argparse
 
 from collections import OrderedDict
 
@@ -99,8 +100,8 @@ class Environment(dict):
             /usr/share/arduino/a/b/c
         """
         places = []
-        if self.arduino_dist_dir:
-            places.append(self.arduino_dist_dir)
+        if 'arduino_dist_dir' in self:
+            places.append(self['arduino_dist_dir'])
         places.extend(self.arduino_dist_dir_guesses)
         return [os.path.join(p, *dirname_parts) for p in places]
 
@@ -154,6 +155,14 @@ class Environment(dict):
 
         parser.epilog = epilog + (parser.epilog or '')
 
+    def add_arduino_dist_arg(self, parser):
+        parser.add_argument('-d', '--arduino-dist', metavar='PATH', 
+                            help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
+
+    def process_args(self, args):
+        arduino_dist = getattr(args, 'arduino_dist', None)
+        if arduino_dist:
+            self['arduino_dist_dir'] = arduino_dist
 
 
 class BoardModelDict(OrderedDict):

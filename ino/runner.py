@@ -28,6 +28,7 @@ def main():
         p.set_defaults(func=cmd.run)
 
     args = parser.parse_args()
+    e.process_args(args)
 
     try:
         args.func(args)

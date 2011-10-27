@@ -22,9 +22,7 @@ class Upload(Command):
                             help='Serial port to upload firmware to\n(default: %(default)s)')
 
         self.e.add_board_model_arg(parser)
-
-        parser.add_argument('-d', '--arduino-dist', metavar='PATH',
-                            help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
+        self.e.add_arduino_dist_arg(parser)
 
     def discover(self):
         self.e.find_tool('stty', ['stty'])
