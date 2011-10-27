@@ -2,6 +2,9 @@
 
 import os.path
 import fnmatch
+import functools
+
+from ino.utils import FileMap
 
 
 class GlobFile(object):
@@ -50,3 +53,9 @@ def objname(filepath):
 @filter
 def libname(filepath):
     return xname(filepath, 'lib%s.a')
+
+
+@filter
+def filemap(sources, target_dir, rename_rule):
+    return FileMap((source, GlobFile(xname(source, rename_rule), target_dir)) 
+                   for source in sources)

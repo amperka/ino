@@ -42,6 +42,11 @@ class Build(Command):
             '-I' + self.e['arduino_core_dir'],
         ])
 
+        self.e['names'] = {
+            'obj': '%s.o',
+            'lib': 'lib%s.a',
+        }
+
     def create_jinja(self):
         jenv = jinja2.Environment(
             undefined=StrictUndefined, # bark on Undefined render
@@ -50,6 +55,10 @@ class Build(Command):
         # inject @filters from ino.filters
         for name, f in inspect.getmembers(ino.filters, lambda x: getattr(x, 'filter', False)):
             jenv.filters[name] = f
+
+        # inject globals
+        jenv.globals['e'] = self.e
+        jenv.globals['SpaceList'] = SpaceList
 
         return jenv
 
@@ -61,7 +70,7 @@ class Build(Command):
         with open(template) as f:
             template = jenv.from_string(f.read())
 
-        makefile_contents = template.render(e=self.e, SpaceList=SpaceList)
+        makefile_contents = template.render()
         makefile_path = os.path.join(self.e['build_dir'], 'Makefile')
         with open(makefile_path, 'wt') as f:
             f.write(makefile_contents)

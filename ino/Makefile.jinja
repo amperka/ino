@@ -28,18 +28,34 @@
 {{ libpath }} : {{ libobjs }}
 	{{ e.ar }} rcs $@ {{ libobjs }}
 
-.build/sketch.cpp : src/sketch.pde
-	echo '#include <WProgram.h>' > .build/sketch.cpp
-	cat src/sketch.pde >> .build/sketch.cpp
+{% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
+{% for source, target in pde.iterpaths() %}
+{{ target }} : {{ source }}
+	echo '#include <WProgram.h>' > $@
+	cat {{ source }} >> $@
+{% endfor %}
 
-.build/sketch.o : .build/sketch.cpp
-	{{ e.cc }} {{ e.cflags }} -o .build/sketch.o -c .build/sketch.cpp
+{% set c = e.src_dir|glob('*.c')|filemap(e.build_dir, e.names.obj) %}
+{% for source, target in c.iterpaths() %}
+{{ target }} : {{ source }}
+	{{ e.cc }} {{ e.cflags }} -o {{ target }} -c {{ source }}
+{% endfor %}
 
-.build/firmware.elf : .build/sketch.o {{ libpath }}
-	{{ e.cc }} -o .build/firmware.elf .build/sketch.o {{ libpath }}
+{% set cpp = (e.src_dir|glob('*.cpp') + pde.targets())|filemap(e.build_dir, e.names.obj) %}
+{% for source, target in cpp.iterpaths() %}
+{{ target }} : {{ source }}
+	{{ e.cxx }} {{ e.cflags }} -o {{ target }} -c {{ source }}
+{% endfor %}
 
-.build/firmware.hex : .build/firmware.elf
-	{{ e.objcopy }} -O ihex -R .eeprom .build/firmware.elf .build/firmware.hex
+{% set objs = c.target_paths() + cpp.target_paths() + [libpath] %}
 
-all : .build/firmware.hex
+{% set elf = e.build_dir|pjoin('firmware.elf') %}
+{{ elf }} : {{ objs }}
+	{{ e.cc }} -o $@ {{ objs }}
+
+{% set hex = e.build_dir|pjoin('firmware.hex') %}
+{{ hex }} : {{ elf }}
+	{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
+
+all : {{ hex }}
 

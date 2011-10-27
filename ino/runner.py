@@ -16,6 +16,7 @@ class Environment(dict):
         super(Environment, self).__init__()
         self['templates_dir'] = os.path.join(os.path.dirname(__file__), '..', 'templates')
 
+        self['src_dir'] = 'src'
         self['build_dir'] = build_dir = '.build'
         if not os.path.isdir(build_dir):
             os.mkdir(build_dir)
