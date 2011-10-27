@@ -1,38 +1,52 @@
 
 {#
- #   Jinja macro to build an AVR library
+ #   Macro to transform *.c -> *.o
  #}
-{% macro library(source_dir, name, add_to) %}
-
-{% set libdir = e.build_dir|pjoin(name) %}
-{% set c = source_dir|glob('*.c')|filemap(libdir, e.names.obj) %}
-{% for source, target in c %}
+{% macro compile_c(filemap) %}
+{% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	mkdir -p {{ target.dirname }}
 	{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
 {% endfor %}
+{% endmacro %}
 
-{% set cpp = (source_dir|glob('*.cpp'))|filemap(libdir, e.names.obj) %}
-{% for source, target in cpp %}
+{#
+ #   Macro to transform *.cpp -> *.o
+ #}
+{% macro compile_cpp(filemap) %}
+{% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	mkdir -p {{ target.dirname }}
 	{{ e.cxx }} {{ e.cflags }} -o $@ -c {{ source.path }}
 {% endfor %}
+{% endmacro %}
 
+
+{#
+ #   Macro to build an AVR library
+ #       source_dir - dir where *.c and *.cpp are
+ #       name       - desired library name without suffix and prefix,
+ #                    e.g. Ethernet
+ #       add_to     - list where result path should be added
+ #}
+{% macro build_library(source_dir, name, add_to) %}
+{% set libdir = e.build_dir|pjoin(name) %}
+{% set c = source_dir|glob('*.c')|filemap(libdir, e.names.obj) %}
+{% set cpp = (source_dir|glob('*.cpp'))|filemap(libdir, e.names.obj) %}
 {% set libpath = libdir|pjoin(name|libname) %}
 {% set libobjs = c.target_paths() + cpp.target_paths() %}
+{{ compile_c(c) }}
+{{ compile_cpp(cpp) }}
 {{ libpath }} : {{ libobjs }}
 	{{ e.ar }} rcs $@ {{ libobjs }}
-
 {% do add_to.append(libpath) %}
-
 {% endmacro %}
 
 {#
  #   library sources -> *.a
  #}
 {% set libs = SpaceList() %}
-{{ library(e.arduino_core_dir, 'core', add_to=libs) }}
+{{ build_library(e.arduino_core_dir, 'core', add_to=libs) }}
 
 {#
  #   *.pde -> *.cpp
@@ -48,19 +62,13 @@
  #   *.c -> *.o
  #}
 {% set c = e.src_dir|glob('*.c')|filemap(e.build_dir, e.names.obj) %}
-{% for source, target in c.iterpaths() %}
-{{ target }} : {{ source }}
-	{{ e.cc }} {{ e.cflags }} -o {{ target }} -c {{ source }}
-{% endfor %}
+{{ compile_c(c) }}
 
 {#
  #   *.cpp -> *.o
  #}
 {% set cpp = (e.src_dir|glob('*.cpp') + pde.targets())|filemap(e.build_dir, e.names.obj) %}
-{% for source, target in cpp.iterpaths() %}
-{{ target }} : {{ source }}
-	{{ e.cxx }} {{ e.cflags }} -o {{ target }} -c {{ source }}
-{% endfor %}
+{{ compile_cpp(cpp) }}
 
 {#
  #   *.o -> elf
