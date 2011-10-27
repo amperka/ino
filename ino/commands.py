@@ -6,6 +6,8 @@ import jinja2
 import subprocess
 import fnmatch
 
+from jinja2.runtime import StrictUndefined
+
 
 class Command(object):
     name = None
@@ -80,26 +82,44 @@ class Init(Command):
             raise CommandError(str(e))
 
 
+class GlobFile(object):
+    def __init__(self, filename, dirname):
+        self.filename = filename
+        self.dirname = dirname
+
+    @property
+    def path(self):
+        return os.path.join(self.dirname, self.filename)
+
+    def __str__(self):
+        return self.filename
+
+
 def glob_filter(dir, *patterns):
     result = []
     for f in os.listdir(dir):
         if any(fnmatch.fnmatch(f, p) for p in patterns):
-            result.append(f)
+            result.append(GlobFile(f, dir))
     return result
 
 def pjoin_filter(base, *parts):
-    return os.path.join(base, *parts)
+    return os.path.join(str(base), *map(str, parts))
 
 
 def objname_filter(filepath):
-    basename, _ = os.path.splitext(filepath)
+    basename, _ = os.path.splitext(str(filepath))
     return basename + '.o'
 
 
 def libname_filter(filepath):
-    head, tail = os.path.split(filepath)
+    head, tail = os.path.split(str(filepath))
     basename, _ = os.path.splitext(tail)
     return os.path.join(head, 'lib%s.a' % basename)
+
+
+class SpaceList(list):
+    def __str__(self):
+        return ' '.join(map(str, self))
 
 
 @command('build')
@@ -107,10 +127,30 @@ class Build(Command):
     def setup_arg_parser(self, parser):
         parser.add_argument('-t', '--template', help='Jinja makefile template to use')
 
-    def run(self, args):
+    def discover(self):
         self.env['arduino_core_dir'] = '/usr/local/share/arduino/hardware/arduino/cores/arduino'
+        self.env['cc'] = 'avr-gcc'
+        self.env['cxx'] = 'avr-g++'
+        self.env['ar'] = 'avr-ar'
+        self.env['objcopy'] = 'avr-objcopy'
 
-        jinja_env = jinja2.Environment()
+        self.env['cflags'] = SpaceList([
+            '-ffunction-sections',
+            '-fdata-sections',
+            '-g', '-gstabs',
+            '-Os', 
+            '-Wl,--gc-sections',
+            '-mmcu=atmega328p',
+            '-DF_CPU=16000000',
+            '-DARDUINO=22',
+            '-lm',
+            '-I' + self.env['arduino_core_dir'],
+        ])
+
+    def run(self, args):
+        self.discover()
+
+        jinja_env = jinja2.Environment(undefined=StrictUndefined, extensions=['jinja2.ext.do'])
         jinja_env.filters['glob'] = glob_filter
         jinja_env.filters['pjoin'] = pjoin_filter
         jinja_env.filters['objname'] = objname_filter
@@ -118,7 +158,7 @@ class Build(Command):
         template = args.template or os.path.join(os.path.dirname(__file__), 'Makefile.jinja')
         with open(template) as f:
             template = jinja_env.from_string(f.read())
-        makefile_contents = template.render(env=self.env)
+        makefile_contents = template.render(e=self.env, SpaceList=SpaceList)
         makefile_path = os.path.join(self.env['build_dir'], 'Makefile')
         with open(makefile_path, 'wt') as f:
             f.write(makefile_contents)
