@@ -19,33 +19,13 @@ class Build(Command):
     name = 'build'
 
     def setup_arg_parser(self, parser):
-        try:
-            boards = self.e.board_models()
-        except Abort:
-            boards = {}
-
-        parser.add_argument('-m', '--board-model', metavar='MODEL', default='uno', choices=boards.keys(),
-                            help='Arduino board model. See below.')
+        self.e.add_board_model_arg(parser)
 
         parser.add_argument('-d', '--arduino-dist', metavar='PATH',
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
 
         parser.add_argument('-t', '--template', 
                             help='Jinja2 makefile template to use.\nUse built-in default if not specified')
-
-    def epilog(self):
-        try:
-            boards = self.e.board_models()
-        except Abort:
-            return "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
-                    "Use --arduino-dist option to specify its location."
-
-        c = ino.filters.colorize
-        default_mark = c('[DEFAULT] ', 'red')
-        boards = ['%s: %s%s' % (c('%12s' % key, 'cyan'), default_mark if key == 'uno' else '', val['name']) 
-                  for key, val in boards.iteritems()]
-
-        return '\n'.join(['Supported Arduino board models:\n'] + boards)
 
     def discover(self):
         self.e.find_arduino_dir('arduino_core_dir', 
@@ -97,7 +77,7 @@ class Build(Command):
 
     def run(self, args):
         self.discover()
-        self.setup_flags(self.e.board_models()[args.board_model])
+        self.setup_flags(args.board_model)
 
         jenv = self.create_jinja()
         template = args.template or os.path.join(os.path.dirname(__file__), '..', 'Makefile.jinja')

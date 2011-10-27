@@ -22,6 +22,8 @@ class Environment(dict):
         '/usr/share/arduino',
     ]
 
+    default_board_model = 'uno'
+
     def __init__(self, *args, **kwargs):
         super(Environment, self).__init__(*args, **kwargs)
         if not os.path.isdir(self.build_dir):
@@ -109,7 +111,7 @@ class Environment(dict):
         boards_txt = self.find_arduino_file('boards.txt', ['hardware', 'arduino'], 
                                             human_name='Board description file (boards.txt)')
 
-        self['board_models'] = OrderedDict()
+        self['board_models'] = BoardModelDict()
         with open(boards_txt) as f:
             for line in f:
                 line = line.strip()
@@ -127,3 +129,39 @@ class Environment(dict):
                 subdict[multikey[-1]] = val
 
         return self['board_models']
+    
+    def add_board_model_arg(self, parser):
+        try:
+            boards = self.board_models()
+        except Abort:
+            boards = {}
+
+        parser.add_argument('-m', '--board-model', metavar='MODEL', 
+                            default=self.default_board_model,
+                            type=boards,
+                            choices=boards.keys(),
+                            help='Arduino board model. See below.')
+
+        if boards:
+            default_mark = colorize('[DEFAULT] ', 'red')
+            board_list = ['%s: %s%s' % (colorize('%12s' % key, 'cyan'), default_mark if key == 'uno' else '', val['name']) 
+                          for key, val in boards.iteritems()]
+
+            epilog = '\n'.join(['Supported Arduino board models:\n'] + board_list)
+        else:
+            epilog = "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
+                     "Use --arduino-dist option to specify its location."
+
+        parser.epilog = epilog + (parser.epilog or '')
+
+
+
+class BoardModelDict(OrderedDict):
+    def __call__(self, model):
+        try:
+            return self[model]
+        except KeyError:
+            raise argparse.ArgumentTypeError("%s is not a valid board model" % model)
+
+    def __hash__(self):
+        return hash(tuple(self.keys()))

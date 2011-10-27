@@ -21,41 +21,20 @@ class Upload(Command):
         parser.add_argument('-p', '--serial-port', metavar='PORT', default='/dev/ttyACM0', 
                             help='Serial port to upload firmware to\n(default: %(default)s)')
 
-        try:
-            boards = self.e.board_models()
-        except Abort:
-            boards = {}
-
-        parser.add_argument('-m', '--board-model', metavar='MODEL', default='uno', choices=boards.keys(),
-                            help='Arduino board model. See below.')
+        self.e.add_board_model_arg(parser)
 
         parser.add_argument('-d', '--arduino-dist', metavar='PATH',
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
 
-    def epilog(self):
-        try:
-            boards = self.e.board_models()
-        except Abort:
-            return "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
-                    "Use --arduino-dist option to specify its location."
-
-        import ino.filters
-        c = ino.filters.colorize
-        default_mark = c('[DEFAULT] ', 'red')
-        boards = ['%s: %s%s' % (c('%12s' % key, 'cyan'), default_mark if key == 'uno' else '', val['name']) 
-                  for key, val in boards.iteritems()]
-
-        return '\n'.join(['Supported Arduino board models:\n'] + boards)
-
     def discover(self):
         self.e.find_tool('stty', ['stty'])
-        self.e.find_arduino_tool('avrdude', ['hardware', 'tools'], ['avrdude'])
-        self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'], ['avrdude.conf'])
+        self.e.find_arduino_tool('avrdude', ['hardware', 'tools'])
+        self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'])
     
     def run(self, args):
         self.discover()
         port = args.serial_port
-        board = self.e.board_models()[args.board_model]
+        board = args.board_model
 
         protocol = board['upload']['protocol']
         if protocol == 'stk500':

@@ -23,7 +23,7 @@ def main():
     is_command = lambda x: inspect.isclass(x) and issubclass(x, Command) and x != Command
     commands = [cls(e) for _, cls in inspect.getmembers(ino.commands, is_command)]
     for cmd in commands:
-        p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter, epilog=cmd.epilog())
+        p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter)
         cmd.setup_arg_parser(p)
         p.set_defaults(func=cmd.run)
 

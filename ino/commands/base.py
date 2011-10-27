@@ -10,8 +10,5 @@ class Command(object):
     def setup_arg_parser(self, parser):
         pass
 
-    def epilog(self):
-        return None
-
     def run(self, args):
         raise NotImplementedError
