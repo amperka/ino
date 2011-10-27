@@ -25,7 +25,7 @@ class Build(Command):
             boards = {}
 
         parser.add_argument('-m', '--board-model', metavar='MODEL', default='uno', choices=boards.keys(),
-                            help='Arduino board model. See below. (default: %(default)s)')
+                            help='Arduino board model. See below.')
 
         parser.add_argument('-d', '--arduino-dist', metavar='PATH',
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
@@ -40,7 +40,11 @@ class Build(Command):
             return "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
                     "Use --arduino-dist option to specify its location."
 
-        boards = ['%12s: %s' % (key, val['name']) for key, val in boards.iteritems()]
+        c = ino.filters.colorize
+        default_mark = c('[DEFAULT] ', 'red')
+        boards = ['%s: %s%s' % (c('%12s' % key, 'cyan'), default_mark if key == 'uno' else '', val['name']) 
+                  for key, val in boards.iteritems()]
+
         return '\n'.join(['Supported Arduino board models:\n'] + boards)
 
     def discover(self):
