@@ -3,6 +3,8 @@
 import os.path
 import itertools
 
+from collections import OrderedDict
+
 from ino.filters import colorize
 from ino.exc import Abort
 
@@ -99,3 +101,29 @@ class Environment(dict):
             places.append(self.arduino_dist_dir)
         places.extend(self.arduino_dist_dir_guesses)
         return [os.path.join(p, *dirname_parts) for p in places]
+
+    def board_models(self):
+        if 'board_models' in self:
+            return self['board_models']
+
+        boards_txt = self.find_arduino_file('boards.txt', ['hardware', 'arduino'], 
+                                            human_name='Board description file (boards.txt)')
+
+        self['board_models'] = OrderedDict()
+        with open(boards_txt) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                multikey, val = line.split('=')
+                multikey = multikey.split('.')
+
+                subdict = self['board_models']
+                for key in multikey[:-1]:
+                    if key not in subdict:
+                        subdict[key] = {}
+                    subdict = subdict[key]
+
+                subdict[multikey[-1]] = val
+
+        return self['board_models']

@@ -12,17 +12,18 @@ from ino.commands.base import Command
 from ino.exc import Abort
 from ino.filters import colorize
 from ino.environment import Environment
+from ino.argparsing import FlexiFormatter
 
 
 def main():
     e = Environment()
 
-    parser = argparse.ArgumentParser(description='Arduino command line environment')
+    parser = argparse.ArgumentParser(prog='ino', description='Arduino command line environment')
     subparsers = parser.add_subparsers()
     is_command = lambda x: inspect.isclass(x) and issubclass(x, Command) and x != Command
     commands = [cls(e) for _, cls in inspect.getmembers(ino.commands, is_command)]
     for cmd in commands:
-        p = subparsers.add_parser(cmd.name)
+        p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter, epilog=cmd.epilog())
         cmd.setup_arg_parser(p)
         p.set_defaults(func=cmd.run)
 
