@@ -9,7 +9,8 @@ from time import sleep
 from serial import Serial
 from serial.serialutil import SerialException
 
-from ino.commands.base import Command, CommandError
+from ino.commands.base import Command
+from ino.exc import Abort
 
 
 class Upload(Command):
@@ -30,17 +31,17 @@ class Upload(Command):
         port = args.serial_port
 
         if not os.path.exists(port):
-            raise CommandError("%s doesn't exist. Is Arduino connected?" % port)
+            raise Abort("%s doesn't exist. Is Arduino connected?" % port)
 
         ret = subprocess.call([self.e['stty'], '-F', port, 'hupcl'])
         if ret:
-            raise CommandError("stty failed")
+            raise Abort("stty failed")
 
         # pulse on dtr
         try:
             s = Serial(port, 115200)
         except SerialException as e:
-            raise CommandError(str(e))
+            raise Abort(str(e))
 
         s.setDTR(False)
         sleep(0.1)

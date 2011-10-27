@@ -3,7 +3,8 @@
 import os.path
 import shutil
 
-from ino.commands.base import Command, CommandError
+from ino.commands.base import Command
+from ino.exc import Abort
 
 
 class Init(Command):
@@ -17,7 +18,7 @@ class Init(Command):
         try:
             copytree(os.path.join(self.e['templates_dir'], args.template), '.')
         except shutil.Error as e:
-            raise CommandError(str(e))
+            raise Abort(str(e))
 
 
 def copytree(src, dst, symlinks=False, ignore=None):

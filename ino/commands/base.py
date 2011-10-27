@@ -12,7 +12,3 @@ class Command(object):
 
     def run(self, args):
         raise NotImplementedError
-
-
-class CommandError(Exception):
-    pass

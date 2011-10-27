@@ -8,7 +8,8 @@ import inspect
 
 import ino.commands
 
-from ino.commands.base import Command, CommandError
+from ino.commands.base import Command
+from ino.exc import Abort
 from ino.filters import colorize
 from ino.environment import Environment
 
@@ -29,9 +30,11 @@ def main():
 
     try:
         args.func(args)
-    except CommandError as e:
+    except Abort as e:
         print colorize(str(e), 'red')
         sys.exit(1)
+    except KeyboardInterrupt:
+        print 'Terminated by user'
 
 
 if __name__ == '__main__':

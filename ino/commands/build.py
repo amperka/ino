@@ -23,11 +23,14 @@ class Build(Command):
         parser.add_argument('-t', '--template', help='Jinja makefile template to use')
 
     def discover(self):
-        self.e['arduino_core_dir'] = '/usr/local/share/arduino/hardware/arduino/cores/arduino'
-        self.e['cc'] = 'avr-gcc'
-        self.e['cxx'] = 'avr-g++'
-        self.e['ar'] = 'avr-ar'
-        self.e['objcopy'] = 'avr-objcopy'
+        self.e.find_dir('arduino_core_dir', ['WProgram.h'], [
+            '/usr/local/share/arduino/hardware/arduino/cores/arduino'
+        ], 'Arduino core library')
+
+        self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
+        self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')
+        self.e.find_tool('ar', ['avr-ar'], human_name='avr-ar')
+        self.e.find_tool('objcopy', ['avr-objcopy'], human_name='avr-objcopy')
 
         self.e['cflags'] = SpaceList([
             '-ffunction-sections',
