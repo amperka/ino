@@ -3,6 +3,7 @@
 import os.path
 import itertools
 import argparse
+import pickle
 
 from collections import OrderedDict
 
@@ -29,6 +30,26 @@ class Environment(dict):
         super(Environment, self).__init__(*args, **kwargs)
         if not os.path.isdir(self.build_dir):
             os.mkdir(self.build_dir)
+
+    def dump(self):
+        if not os.path.exists(self.build_dir):
+            return
+        with open(self.dump_filepath, 'wb') as f:
+            pickle.dump(self.items(), f)
+
+    def load(self):
+        if not os.path.exists(self.dump_filepath):
+            return
+        with open(self.dump_filepath, 'rb') as f:
+            try:
+                self.update(pickle.load(f))
+            except:
+                print colorize('Environment dump exists (%s), but failed to load' % 
+                               self.dump_filepath, 'yellow')
+
+    @property
+    def dump_filepath(self):
+        return os.path.join(self.build_dir, 'environment.pickle')
 
     def __getitem__(self, key):
         try:

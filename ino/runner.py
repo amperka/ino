@@ -17,6 +17,7 @@ from ino.argparsing import FlexiFormatter
 
 def main():
     e = Environment()
+    e.load()
 
     parser = argparse.ArgumentParser(prog='ino', description='Arduino command line environment')
     subparsers = parser.add_subparsers()
@@ -32,11 +33,13 @@ def main():
 
     try:
         args.func(args)
-    except Abort as e:
-        print colorize(str(e), 'red')
+    except Abort as exc:
+        print colorize(str(exc), 'red')
         sys.exit(1)
     except KeyboardInterrupt:
         print 'Terminated by user'
+    finally:
+        e.dump()
 
 
 if __name__ == '__main__':
