@@ -32,14 +32,23 @@ class Build(Command):
         self.e['cflags'] = SpaceList([
             '-ffunction-sections',
             '-fdata-sections',
-            '-g', '-gstabs',
-            '-Os', 
-            '-Wl,--gc-sections',
             '-mmcu=atmega328p',
+            '-g',
+            '-Os', 
+            '-w',
             '-DF_CPU=16000000',
             '-DARDUINO=22',
-            '-lm',
             '-I' + self.e['arduino_core_dir'],
+        ])
+
+        self.e['cxxflags'] = SpaceList([
+            '-fno-exceptions'
+        ])
+
+        self.e['elfflags'] = SpaceList([
+            '-Os', 
+            '-Wl,--gc-sections', 
+            '-mmcu=atmega328p',
         ])
 
         self.e['names'] = {

@@ -21,6 +21,8 @@ class Environment(dict):
         if not os.path.isdir(build_dir):
             os.mkdir(build_dir)
 
+        self['hex_path'] = '.build/firmware.hex'
+
 def main():
     parser = argparse.ArgumentParser(description='Arduino command line environment')
     subparsers = parser.add_subparsers()

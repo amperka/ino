@@ -17,7 +17,7 @@
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	mkdir -p {{ target.dirname }}
-	{{ e.cxx }} {{ e.cflags }} -o $@ -c {{ source.path }}
+	{{ e.cxx }} {{ e.cflags }} {{ e.cxxflags }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
 
@@ -76,7 +76,7 @@
 {% set objs = c.target_paths() + cpp.target_paths() + libs %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
-	{{ e.cc }} -o $@ {{ objs }}
+	{{ e.cc }} {{ e.elfflags }} -o $@ {{ objs }} -lm
 
 {#
  #   elf -> hex
