@@ -1,33 +1,42 @@
 
-{% set libname = 'core' %}
-{% set libdir = e.build_dir|pjoin(libname) %}
-{% set libpath = libdir|pjoin(libname|libname) %}
-{% set libobjs = SpaceList() %}
+{#
+ #   Jinja macro to build an AVR library
+ #}
+{% macro library(source_dir, name, add_to) %}
 
-# mkdir for lib objects
-{{ libdir }} :
-	mkdir -p {{ libdir }}
+{% set libdir = e.build_dir|pjoin(name) %}
+{% set c = source_dir|glob('*.c')|filemap(libdir, e.names.obj) %}
+{% for source, target in c %}
+{{ target.path }} : {{ source.path }}
+	mkdir -p {{ target.dirname }}
+	{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
+{% endfor %}
 
-# core library .c -> objects (.o)
-{% for file in e.arduino_core_dir|glob('*.c') %}
-{% set objname = libdir|pjoin(file)|objname %}
-{% do libobjs.append(objname) %}
-{{ objname }} : {{ libdir }} {{ file.path }}
-	{{ e.cc }} {{ e.cflags }} -c {{ file.path }} -o $@
-{% endfor -%}
+{% set cpp = (source_dir|glob('*.cpp'))|filemap(libdir, e.names.obj) %}
+{% for source, target in cpp %}
+{{ target.path }} : {{ source.path }}
+	mkdir -p {{ target.dirname }}
+	{{ e.cxx }} {{ e.cflags }} -o $@ -c {{ source.path }}
+{% endfor %}
 
-# core library .cpp -> objects (.o)
-{% for file in e.arduino_core_dir|glob('*.cpp') %}
-{% set objname = libdir|pjoin(file)|objname %}
-{% do libobjs.append(objname) %}
-{{ objname }} : {{ libdir }} {{ file.path }}
-	{{ e.cxx }} {{ e.cflags }} -c {{ file.path }} -o $@
-{% endfor -%}
-
-# core lib objects -> archive (.a)
+{% set libpath = libdir|pjoin(name|libname) %}
+{% set libobjs = c.target_paths() + cpp.target_paths() %}
 {{ libpath }} : {{ libobjs }}
 	{{ e.ar }} rcs $@ {{ libobjs }}
 
+{% do add_to.append(libpath) %}
+
+{% endmacro %}
+
+{#
+ #   library sources -> *.a
+ #}
+{% set libs = SpaceList() %}
+{{ library(e.arduino_core_dir, 'core', add_to=libs) }}
+
+{#
+ #   *.pde -> *.cpp
+ #}
 {% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
 {% for source, target in pde.iterpaths() %}
 {{ target }} : {{ source }}
@@ -35,27 +44,39 @@
 	cat {{ source }} >> $@
 {% endfor %}
 
+{#
+ #   *.c -> *.o
+ #}
 {% set c = e.src_dir|glob('*.c')|filemap(e.build_dir, e.names.obj) %}
 {% for source, target in c.iterpaths() %}
 {{ target }} : {{ source }}
 	{{ e.cc }} {{ e.cflags }} -o {{ target }} -c {{ source }}
 {% endfor %}
 
+{#
+ #   *.cpp -> *.o
+ #}
 {% set cpp = (e.src_dir|glob('*.cpp') + pde.targets())|filemap(e.build_dir, e.names.obj) %}
 {% for source, target in cpp.iterpaths() %}
 {{ target }} : {{ source }}
 	{{ e.cxx }} {{ e.cflags }} -o {{ target }} -c {{ source }}
 {% endfor %}
 
-{% set objs = c.target_paths() + cpp.target_paths() + [libpath] %}
-
+{#
+ #   *.o -> elf
+ #}
+{% set objs = c.target_paths() + cpp.target_paths() + libs %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
 	{{ e.cc }} -o $@ {{ objs }}
 
+{#
+ #   elf -> hex
+ #}
 {% set hex = e.build_dir|pjoin('firmware.hex') %}
 {{ hex }} : {{ elf }}
 	{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
 
 all : {{ hex }}
 
+{# vim:noexpandtab #}
