@@ -13,8 +13,6 @@ from ino.commands.base import Command
 from ino.utils import SpaceList
 
 
-
-
 class Build(Command):
 
     name = 'build'
@@ -23,9 +21,10 @@ class Build(Command):
         parser.add_argument('-t', '--template', help='Jinja makefile template to use')
 
     def discover(self):
-        self.e.find_dir('arduino_core_dir', ['WProgram.h'], [
-            '/usr/local/share/arduino/hardware/arduino/cores/arduino'
-        ], 'Arduino core library')
+        self.e.find_arduino_dir('arduino_core_dir', 
+                                ['hardware', 'arduino', 'cores', 'arduino'], 
+                                ['WProgram.h'], 
+                                'Arduino core library')
 
         self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
         self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')

@@ -13,6 +13,12 @@ class Environment(dict):
     build_dir = '.build'
     src_dir = 'src'
     hex_filename = 'firmware.hex'
+    arduino_dist_dir = None
+
+    arduino_dist_dir_guesses = [
+        '/usr/local/share/arduino',
+        '/usr/share/arduino',
+    ]
 
     def __init__(self, *args, **kwargs):
         super(Environment, self).__init__(*args, **kwargs)
@@ -65,5 +71,31 @@ class Environment(dict):
     def find_dir(self, key, items, places, human_name=None):
         return self._find(key, items, places, human_name, join=False)
 
+    def find_file(self, key, items, places=None, human_name=None):
+        return self._find(key, items, places, human_name, join=True)
+
     def find_tool(self, key, items, places=None, human_name=None):
-        return self._find(key, items, places or ['$PATH'], human_name, join=True)
+        return self.find_file(key, items, places or ['$PATH'], human_name)
+
+    def find_arduino_dir(self, key, dirname_parts, items, human_name=None):
+        return self.find_dir(key, items, self._arduino_dist_places(dirname_parts), human_name)
+
+    def find_arduino_file(self, key, dirname_parts, human_name=None):
+        return self.find_file(key, [key], self._arduino_dist_places(dirname_parts), human_name)
+
+    def find_arduino_tool(self, key, filename_parts, human_name=None):
+        return self.find_arduino_file(key, filename_parts, human_name)
+
+    def _arduino_dist_places(self, dirname_parts):
+        """
+        For `dirname_parts` like [a, b, c] return list of
+        search paths within Arduino distribution directory like:
+            /user/specified/path/a/b/c
+            /usr/local/share/arduino/a/b/c
+            /usr/share/arduino/a/b/c
+        """
+        places = []
+        if self.arduino_dist_dir:
+            places.append(self.arduino_dist_dir)
+        places.extend(self.arduino_dist_dir_guesses)
+        return [os.path.join(p, *dirname_parts) for p in places]

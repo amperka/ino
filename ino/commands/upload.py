@@ -22,9 +22,9 @@ class Upload(Command):
                             help='Serial port to upload firmware to')
 
     def discover(self):
-        self.e['stty'] = 'stty'
-        self.e['avrdude'] = '/usr/local/share/arduino/hardware/tools/avrdude'
-        self.e['avrdude.conf'] = '/usr/local/share/arduino/hardware/tools/avrdude.conf'
+        self.e.find_tool('stty', ['stty'])
+        self.e.find_arduino_tool('avrdude', ['hardware', 'tools'], ['avrdude'])
+        self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'], ['avrdude.conf'])
     
     def run(self, args):
         self.discover()

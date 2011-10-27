@@ -16,7 +16,8 @@ class Serial(Command):
                             help='Communication baud rate, should match value set in Serial.begin() on Arduino')
 
     def run(self, args):
-        serial_monitor = 'picocom'
+        serial_monitor = self.e.find_tool('serial', ['picocom'], human_name='Serial monitor (picocom)')
+
         subprocess.call([
             serial_monitor,
             args.serial_port,
