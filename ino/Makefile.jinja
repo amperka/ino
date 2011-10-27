@@ -79,18 +79,17 @@
 {% set objs = c.target_paths() + cpp.target_paths() + libs %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
-	@echo {{ ('Linking firmware.elf') |colorize('green') }}
+	@echo {{ 'Linking firmware.elf'|colorize('green') }}
 	@{{ e.cc }} {{ e.elfflags }} -o $@ {{ objs }} -lm
 
 {#
  #   elf -> hex
  #}
-{% set hex = e.build_dir|pjoin('firmware.hex') %}
-{{ hex }} : {{ elf }}
-	@echo {{ ('Converting to firmware.hex') |colorize('green') }}
+{{ e.hex_path }} : {{ elf }}
+	@echo {{ ('Converting to ' ~ e.hex_filename)|colorize('green') }}
 	@{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
 
-all : {{ hex }}
+all : {{ e.hex_path }}
 
 {#
 vim:noexpandtab filetype=jinja

@@ -10,30 +10,21 @@ import ino.commands
 
 from ino.commands.base import Command, CommandError
 from ino.filters import colorize
+from ino.environment import Environment
 
-
-class Environment(dict):
-    def __init__(self, *args, **kwargs):
-        super(Environment, self).__init__()
-        self['templates_dir'] = os.path.join(os.path.dirname(__file__), '..', 'templates')
-
-        self['src_dir'] = 'src'
-        self['build_dir'] = build_dir = '.build'
-        if not os.path.isdir(build_dir):
-            os.mkdir(build_dir)
-
-        self['hex_path'] = '.build/firmware.hex'
 
 def main():
+    e = Environment()
+
     parser = argparse.ArgumentParser(description='Arduino command line environment')
     subparsers = parser.add_subparsers()
     is_command = lambda x: inspect.isclass(x) and issubclass(x, Command) and x != Command
-    env = Environment()
-    commands = [cls(env) for _, cls in inspect.getmembers(ino.commands, is_command)]
+    commands = [cls(e) for _, cls in inspect.getmembers(ino.commands, is_command)]
     for cmd in commands:
         p = subparsers.add_parser(cmd.name)
         cmd.setup_arg_parser(p)
         p.set_defaults(func=cmd.run)
+
     args = parser.parse_args()
 
     try:
