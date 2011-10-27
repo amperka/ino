@@ -59,10 +59,11 @@ class Build(Command):
         self.e.find_tool('objcopy', ['avr-objcopy'], human_name='avr-objcopy')
 
     def setup_flags(self, board):
+        mcu = '-mmcu=' + board['build']['mcu']
         self.e['cflags'] = SpaceList([
+            mcu,
             '-ffunction-sections',
             '-fdata-sections',
-            '-mmcu=' + board['build']['mcu'],
             '-g',
             '-Os', 
             '-w',
@@ -71,15 +72,8 @@ class Build(Command):
             '-I' + self.e['arduino_core_dir'],
         ])
 
-        self.e['cxxflags'] = SpaceList([
-            '-fno-exceptions'
-        ])
-
-        self.e['elfflags'] = SpaceList([
-            '-Os', 
-            '-Wl,--gc-sections', 
-            '-mmcu=atmega328p',
-        ])
+        self.e['cxxflags'] = SpaceList(['-fno-exceptions'])
+        self.e['elfflags'] = SpaceList(['-Os', '-Wl,--gc-sections', mcu])
 
         self.e['names'] = {
             'obj': '%s.o',
