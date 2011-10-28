@@ -50,6 +50,9 @@
  #}
 {% set libs = SpaceList() %}
 {{ build_library(e.arduino_core_dir, 'core', add_to=libs) }}
+{% for libdir in e.extra_libs %}
+{{ build_library(libdir, libdir|basename, add_to=libs) }}
+{% endfor %}
 
 {#
  #   *.pde -> *.cpp
@@ -88,6 +91,8 @@
 {{ e.hex_path }} : {{ elf }}
 	@echo {{ ('Converting to ' ~ e.hex_filename)|colorize('green') }}
 	@{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
+
+include {{ e.build_dir|pjoin('dependencies.d') }}
 
 all : {{ e.hex_path }}
 

@@ -16,9 +16,10 @@ class Environment(dict):
     templates_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
     build_dir = '.build'
     src_dir = 'src'
+    lib_dir = 'lib'
     hex_filename = 'firmware.hex'
-    arduino_dist_dir = None
 
+    arduino_dist_dir = None
     arduino_dist_dir_guesses = [
         '/usr/local/share/arduino',
         '/usr/share/arduino',
@@ -95,7 +96,7 @@ class Environment(dict):
                     (human_name, ''.join(['\n  - ' + p for p in places])))
 
     def find_dir(self, key, items, places, human_name=None):
-        return self._find(key, items, places, human_name, join=False)
+        return self._find(key, items or ['.'], places, human_name, join=False)
 
     def find_file(self, key, items, places=None, human_name=None):
         return self._find(key, items, places, human_name, join=True)
@@ -103,7 +104,7 @@ class Environment(dict):
     def find_tool(self, key, items, places=None, human_name=None):
         return self.find_file(key, items, places or ['$PATH'], human_name)
 
-    def find_arduino_dir(self, key, dirname_parts, items, human_name=None):
+    def find_arduino_dir(self, key, dirname_parts, items=None, human_name=None):
         return self.find_dir(key, items, self._arduino_dist_places(dirname_parts), human_name)
 
     def find_arduino_file(self, key, dirname_parts, human_name=None):
@@ -166,7 +167,9 @@ class Environment(dict):
 
         if boards:
             default_mark = colorize('[DEFAULT] ', 'red')
-            board_list = ['%s: %s%s' % (colorize('%12s' % key, 'cyan'), default_mark if key == 'uno' else '', val['name']) 
+            board_list = ['%s: %s%s' % (colorize('%12s' % key, 'cyan'), 
+                                        default_mark if key == self.default_board_model else '', 
+                                        val['name']) 
                           for key, val in boards.iteritems()]
 
             epilog = '\n'.join(['Supported Arduino board models:\n'] + board_list)

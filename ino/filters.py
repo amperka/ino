@@ -5,7 +5,7 @@ import os.path
 import fnmatch
 import functools
 
-from ino.utils import FileMap
+from ino.utils import FileMap, SpaceList
 
 
 class GlobFile(object):
@@ -28,7 +28,7 @@ def filter(f):
 
 @filter
 def glob(dir, *patterns):
-    result = []
+    result = SpaceList()
     for f in os.listdir(dir):
         if any(fnmatch.fnmatch(f, p) for p in patterns):
             result.append(GlobFile(f, dir))
@@ -54,6 +54,9 @@ def objname(filepath):
 @filter
 def libname(filepath):
     return xname(filepath, 'lib%s.a')
+
+
+basename = filter(os.path.basename)
 
 
 @filter

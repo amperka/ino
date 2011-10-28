@@ -1,0 +1,25 @@
+
+{% set dpath = e.build_dir|pjoin('dependencies.d') %}
+
+{#
+ #   *.pde -> *.cpp
+ #}
+{% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
+{% for source, target in pde.iterpaths() %}
+{{ target }} : {{ source }}
+	@echo '#include <WProgram.h>' > $@
+	@cat {{ source }} >> $@
+{% endfor %}
+
+{#
+ #   *.c *.cpp -> dependencies.d
+ #}
+{{ dpath }} : {{ pde.target_paths() + (e.src_dir|glob('*.c', '*.cpp')).paths() }}
+	@echo {{ 'Scanning dependencies'|colorize('cyan') }}
+	@{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
+
+all: {{ dpath }}
+
+{#
+vim:noexpandtab filetype=jinja
+#}
