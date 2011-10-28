@@ -6,6 +6,8 @@ import os.path
 import argparse
 import inspect
 
+from configobj import ConfigObj
+
 import ino.commands
 
 from ino.commands.base import Command
@@ -15,9 +17,22 @@ from ino.environment import Environment
 from ino.argparsing import FlexiFormatter
 
 
+def configure():
+    etc = ConfigObj('/etc/ino.ini')
+    home = ConfigObj(os.path.expanduser('~/.inorc'))
+    cwd = ConfigObj('ino.ini')
+    cfg = etc
+    cfg.merge(home)
+    cfg.merge(cwd)
+    return cfg
+
+
 def main():
     e = Environment()
     e.load()
+
+    conf = configure()
+    conf_scalars = dict((key, conf[key]) for key in conf.scalars)
 
     parser = argparse.ArgumentParser(prog='ino', description='Arduino command line environment')
     subparsers = parser.add_subparsers()
@@ -26,7 +41,9 @@ def main():
     for cmd in commands:
         p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter)
         cmd.setup_arg_parser(p)
-        p.set_defaults(func=cmd.run)
+        conf_defaults = conf_scalars.copy()
+        conf_defaults.update(conf.get(cmd.name, {}))
+        p.set_defaults(func=cmd.run, **conf_defaults)
 
     args = parser.parse_args()
     e.process_args(args)
