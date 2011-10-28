@@ -78,7 +78,7 @@ class Environment(dict):
 
         # expand env variables in `places` and split on colons
         places = itertools.chain.from_iterable(os.path.expandvars(p).split(os.pathsep) for p in places)
-        places = list(places)
+        places = map(os.path.expanduser, places)
 
         print 'Searching for', human_name, '...',
         for p in places:
