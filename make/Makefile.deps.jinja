@@ -1,10 +1,8 @@
 
-{% set dpath = e.build_dir|pjoin('dependencies.d') %}
-
 {#
  #   *.pde -> *.cpp
  #}
-{% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
+{% set pde = src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
 {% for source, target in pde.iterpaths() %}
 {{ target }} : {{ source }}
 	@mkdir -p {{ target|dirname }}
@@ -13,13 +11,14 @@
 {% endfor %}
 
 {#
- #   *.c *.cpp -> dependencies.d
+ #   *.c *.cpp -> dependencies file
  #}
-{{ dpath }} : {{ pde.target_paths() + (e.src_dir|glob('*.c', '*.cpp')).paths() }}
-	@echo {{ 'Scanning dependencies'|colorize('cyan') }}
+{{ output_filepath }} : {{ pde.target_paths() + (src_dir|glob('*.c', '*.cpp')).paths() }}
+	@mkdir -p {{ output_filepath|dirname }}
+	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
 	@{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
 
-all: {{ dpath }}
+all: {{ output_filepath }}
 
 {#
 vim:noexpandtab filetype=jinja

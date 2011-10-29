@@ -6,7 +6,7 @@
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	@echo {{ source.filename|colorize('yellow') }}
-	@mkdir -p {{ target.dirname }}
+	@mkdir -p {{ target.path|dirname }}
 	@{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
@@ -18,7 +18,7 @@
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	@echo {{ source.filename|colorize('yellow') }}
-	@mkdir -p {{ target.dirname }}
+	@mkdir -p {{ target.path|dirname }}
 	@{{ e.cxx }} {{ e.cflags }} {{ e.cxxflags }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
@@ -92,7 +92,7 @@
 	@echo {{ ('Converting to ' ~ e.hex_filename)|colorize('green') }}
 	@{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
 
-include {{ e.build_dir|pjoin('dependencies.d') }}
+include {{ e.deps }}
 
 all : {{ e.hex_path }}
 
