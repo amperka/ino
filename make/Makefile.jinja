@@ -1,26 +1,22 @@
 
 {#
- #   Macro to transform *.c -> *.o
+ #   Macros to transform *.c and *.cpp -> *.o
  #}
-{% macro compile_c(filemap) %}
+{% macro compile(filemap, compiler) %}
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
 	@echo {{ source.filename|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
-	@{{ e.cc }} {{ e.cflags }} -o $@ -c {{ source.path }}
+	@{{ compiler }} -o $@ -c {{ source.path }}
 {% endfor %}
 {% endmacro %}
 
-{#
- #   Macro to transform *.cpp -> *.o
- #}
+{% macro compile_c(filemap) %}
+{{ compile(filemap, e.cc ~ ' ' ~ e.cflags) }}
+{% endmacro %}
+
 {% macro compile_cpp(filemap) %}
-{% for source, target in filemap %}
-{{ target.path }} : {{ source.path }}
-	@echo {{ source.filename|colorize('yellow') }}
-	@mkdir -p {{ target.path|dirname }}
-	@{{ e.cxx }} {{ e.cflags }} {{ e.cxxflags }} -o $@ -c {{ source.path }}
-{% endfor %}
+{{ compile(filemap, e.cxx ~ ' ' ~ e.cflags ~ ' ' ~ e.cxxflags) }}
 {% endmacro %}
 
 
