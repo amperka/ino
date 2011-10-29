@@ -7,6 +7,7 @@
 {% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
 {% for source, target in pde.iterpaths() %}
 {{ target }} : {{ source }}
+	@mkdir -p {{ target|dirname }}
 	@echo '#include <WProgram.h>' > $@
 	@cat {{ source }} >> $@
 {% endfor %}

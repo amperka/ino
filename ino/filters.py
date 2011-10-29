@@ -17,6 +17,9 @@ class GlobFile(object):
     def path(self):
         return os.path.join(self.dirname, self.filename)
 
+    def __repr__(self):
+        return '<%s + %s>' % (self.dirname, self.filename)
+
     def __str__(self):
         return self.filename
 
@@ -27,11 +30,21 @@ def filter(f):
 
 
 @filter
-def glob(dir, *patterns):
+def glob(dir, *patterns, **kwargs):
+    recursive = kwargs.get('recursive', True)
+    subdir = kwargs.get('subdir', '')
+
     result = SpaceList()
-    for f in os.listdir(dir):
-        if any(fnmatch.fnmatch(f, p) for p in patterns):
-            result.append(GlobFile(f, dir))
+    scan_dir = os.path.join(dir, subdir)
+    for entry in os.listdir(scan_dir):
+        path = os.path.join(scan_dir, entry)
+        if os.path.isdir(path) and recursive:
+            subglob = glob(dir, *patterns, recursive=True,
+                           subdir=os.path.join(subdir, entry))
+            result.extend(subglob)
+        elif os.path.isfile(path) and any(fnmatch.fnmatch(entry, p) for p in patterns):
+            result.append(GlobFile(os.path.join(subdir, entry), dir))
+
     return result
 
 
@@ -57,6 +70,7 @@ def libname(filepath):
 
 
 basename = filter(os.path.basename)
+dirname = filter(os.path.dirname)
 
 
 @filter

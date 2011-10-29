@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import os.path
+import itertools
 
 
 class SpaceList(list):
@@ -31,6 +32,12 @@ class FileMap(dict):
         return SpaceList(x.path for x in self.targets())
 
 
-def list_subdirs(dirname):
-    entries = [os.path.join(dirname, entry) for entry in os.listdir(dirname)]
-    return filter(os.path.isdir, entries)
+def list_subdirs(dirname, recursive=False, exclude=[]):
+    entries = [e for e in os.listdir(dirname) if e not in exclude]
+    paths = [os.path.join(dirname, e) for e in entries]
+    dirs = filter(os.path.isdir, paths)
+    if recursive:
+        sub = itertools.chain.from_iterable(
+            list_subdirs(d, recursive=True, exclude=exclude) for d in dirs)
+        dirs.extend(sub)
+    return dirs

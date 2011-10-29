@@ -84,11 +84,17 @@ class Build(Command):
 
         return out_path
 
+    def recursive_inc_lib_flags(self, libdirs):
+        flags = SpaceList()
+        for d in libdirs:
+            flags.append('-I' + d)
+            flags.extend('-I' + subd for subd in list_subdirs(d, recursive=True, exclude=['examples']))
+        return flags
+
     def scan_dependencies(self):
         libdirs = list_subdirs(self.e.lib_dir) + list_subdirs(self.e.arduino_libraries_dir)
-        inc_flags = SpaceList('-I' + d for d in libdirs)
         makefile = self.render_template('Makefile.deps.jinja', 'Makefile.deps',
-                                        inc_flags=inc_flags)
+                                        inc_flags=self.recursive_inc_lib_flags(libdirs))
 
         subprocess.call(['make', '-f', makefile, 'all'])
 
@@ -112,7 +118,7 @@ class Build(Command):
                     used_libs.add(match.group('libdir'))
 
         self.e['extra_libs'] = list(used_libs)
-        self.e['cflags'].extend('-I' + d for d in self.e.extra_libs)
+        self.e['cflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
     def build(self):
         makefile = self.render_template('Makefile.jinja', 'Makefile')
