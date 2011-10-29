@@ -60,7 +60,9 @@ class Build(Command):
         }
 
     def create_jinja(self):
+        templates_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'make')
         self.jenv = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(templates_dir),
             undefined=StrictUndefined, # bark on Undefined render
             extensions=['jinja2.ext.do'])
 
@@ -73,10 +75,7 @@ class Build(Command):
         self.jenv.globals['SpaceList'] = SpaceList
 
     def render_template(self, source, target, **ctx):
-        template = os.path.join(os.path.dirname(__file__), '..', '..', 'make', source)
-        with open(template) as f:
-            template = self.jenv.from_string(f.read())
-
+        template = self.jenv.get_template(source)
         contents = template.render(**ctx)
         out_path = os.path.join(self.e['build_dir'], target)
         with open(out_path, 'wt') as f:

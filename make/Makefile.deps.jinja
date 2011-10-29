@@ -1,19 +1,16 @@
 
+{% from 'Makefile.common.jinja' import transform_sketches with context %}
+
 {#
- #   *.pde -> *.cpp
+ #   sketches -> *.cpp
  #}
-{% set pde = src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
-{% for source, target in pde.iterpaths() %}
-{{ target }} : {{ source }}
-	@mkdir -p {{ target|dirname }}
-	@echo '#include <WProgram.h>' > $@
-	@cat {{ source }} >> $@
-{% endfor %}
+{% set sketch_cpps = SpaceList() %}
+{{ transform_sketches(src_dir, sketch_cpps) }}
 
 {#
  #   *.c *.cpp -> dependencies file
  #}
-{{ output_filepath }} : {{ pde.target_paths() + (src_dir|glob('*.c', '*.cpp')).paths() }}
+{{ output_filepath }} : {{ sketch_cpps.paths() + (src_dir|glob('*.c', '*.cpp')).paths() }}
 	@mkdir -p {{ output_filepath|dirname }}
 	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
 	@{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;

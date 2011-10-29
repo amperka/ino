@@ -1,0 +1,20 @@
+
+{% macro _transform_sketches(src_dir, ext, header, add_to) %}
+{% set pde = src_dir|glob(ext)|filemap(e.build_dir|pjoin(src_dir|basename), '%s.cpp') %}
+{% for source, target in pde.iterpaths() %}
+{{ target }} : {{ source }}
+	@mkdir -p {{ target|dirname }}
+	@echo '{{ header }}' > $@
+	@cat {{ source }} >> $@
+{% endfor %}
+{% do add_to.extend(pde.targets()) %}
+{% endmacro %}
+
+{% macro transform_sketches(src_dir, add_to) %}
+{{ _transform_sketches(src_dir, '*.pde', '#include <WProgram.h>', add_to) }}
+{{ _transform_sketches(src_dir, '*.ino', '#include <Arduino.h>', add_to) }}
+{% endmacro %}
+
+{#
+vim:noexpandtab filetype=jinja
+#}

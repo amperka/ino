@@ -1,4 +1,7 @@
 
+{% from 'Makefile.common.jinja' import transform_sketches with context %}
+{% set src_build_dir = e.build_dir|pjoin(e.src_dir|basename) %}
+
 {#
  #   Macros to transform *.c and *.cpp -> *.o
  #}
@@ -51,25 +54,21 @@
 {% endfor %}
 
 {#
- #   *.pde -> *.cpp
+ #   sketches -> *.cpp
  #}
-{% set pde = e.src_dir|glob('*.pde')|filemap(e.build_dir, '%s.cpp') %}
-{% for source, target in pde.iterpaths() %}
-{{ target }} : {{ source }}
-	@echo '#include <WProgram.h>' > $@
-	@cat {{ source }} >> $@
-{% endfor %}
+{% set sketch_cpps = SpaceList() %}
+{{ transform_sketches(e.src_dir, sketch_cpps) }}
 
 {#
  #   *.c -> *.o
  #}
-{% set c = e.src_dir|glob('*.c')|filemap(e.build_dir, e.names.obj) %}
+{% set c = e.src_dir|glob('*.c')|filemap(src_build_dir, e.names.obj) %}
 {{ compile_c(c) }}
 
 {#
  #   *.cpp -> *.o
  #}
-{% set cpp = (e.src_dir|glob('*.cpp') + pde.targets())|filemap(e.build_dir, e.names.obj) %}
+{% set cpp = (e.src_dir|glob('*.cpp') + sketch_cpps)|filemap(src_build_dir, e.names.obj) %}
 {{ compile_cpp(cpp) }}
 
 {#
