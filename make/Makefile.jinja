@@ -8,7 +8,7 @@
 {% macro compile(filemap, compiler) %}
 {% for source, target in filemap %}
 {{ target.path }} : {{ source.path }}
-	@echo {{ source.filename|colorize('yellow') }}
+	@echo {{ (source.dirname|basename|pjoin(source.filename))|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
 	@{{ compiler }} -o $@ -c $^
 {% endfor %}
