@@ -10,7 +10,7 @@
 {{ target.path }} : {{ source.path }}
 	@echo {{ source.filename|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
-	@{{ compiler }} -o $@ -c {{ source.path }}
+	@{{ compiler }} -o $@ -c $^
 {% endfor %}
 {% endmacro %}
 
@@ -40,7 +40,7 @@
 {{ compile_cpp(cpp) }}
 {{ libpath }} : {{ libobjs }}
 	@echo {{ ('Linking ' ~ name|libname) |colorize('green') }}
-	@{{ e.ar }} rcs $@ {{ libobjs }}
+	@{{ e.ar }} rcs $@ $^
 {% do add_to.append(libpath) %}
 {% endmacro %}
 
@@ -78,14 +78,14 @@
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
 	@echo {{ 'Linking firmware.elf'|colorize('green') }}
-	@{{ e.cc }} {{ e.elfflags }} -o $@ {{ objs }} -lm
+	@{{ e.cc }} {{ e.elfflags }} -o $@ $^ -lm
 
 {#
  #   elf -> hex
  #}
 {{ e.hex_path }} : {{ elf }}
 	@echo {{ ('Converting to ' ~ e.hex_filename)|colorize('green') }}
-	@{{ e.objcopy }} -O ihex -R .eeprom {{ elf }} $@
+	@{{ e.objcopy }} -O ihex -R .eeprom $^ $@
 
 include {{ e.deps }}
 
