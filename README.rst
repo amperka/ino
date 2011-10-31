@@ -68,9 +68,9 @@ Limitations
 Getting Help
 ============
     
-    * Take a look at [Quick start tutorial].
+    * Take a look at `Quick start tutorial <http://inotool.org/quickstart.html>`_.
     * Run ``ino --help``.
-    * Post issues to GitHub.
+    * Post `issues to GitHub <http://github.com/amperka/ino/issues>`_.
 
 License
 =======
