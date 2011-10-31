@@ -100,3 +100,7 @@ pre {
 
 ul { padding-left: 0; }
 ul li { list-style-type: square; }
+
+.footer {
+    padding-bottom: 1em;
+}
