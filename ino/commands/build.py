@@ -11,6 +11,7 @@ from jinja2.runtime import StrictUndefined
 import ino.filters
 
 from ino.commands.base import Command
+from ino.filters import colorize
 from ino.utils import SpaceList, list_subdirs
 from ino.exc import Abort
 
@@ -50,6 +51,16 @@ class Build(Command):
         self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],
                                 human_name='Arduino standard libraries')
 
+        
+        self.e.find_arduino_file('version.txt', ['lib'],
+                                 human_name='Arduino lib version file (version.txt)')
+
+        if 'arduino_lib_version' not in self.e:
+            with open(self.e['version.txt']) as f:
+                print 'Detecting Arduino software version ... ',
+                self.e['arduino_lib_version'] = v = int(f.read().strip())
+                print colorize(str(v), 'green')
+
         self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
         self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')
         self.e.find_tool('ar', ['avr-ar'], human_name='avr-ar')
@@ -65,7 +76,7 @@ class Build(Command):
             '-Os', 
             '-w',
             '-DF_CPU=' + board['build']['f_cpu'],
-            '-DARDUINO=22',
+            '-DARDUINO=' + str(self.e['arduino_lib_version']),
             '-I' + self.e['arduino_core_dir'],
         ])
 
