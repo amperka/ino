@@ -196,6 +196,11 @@ is set with ``--serial-port`` or ``-p`` switch. So lets do it::
     $ ino upload -m mega2560 -p /dev/ttyACM1
     $ ino serial -p /dev/ttyACM1
 
+For the full list of board names refer to ``ino build --help``.
+
+Configuration files
+-------------------
+
 It can be annoying to provide these switches over and over again. So
 you can save them in ``ino.ini`` file in project directory. Put
 following lines to the ``ino.ini``::
@@ -221,10 +226,10 @@ is enough::
     serial-port = /dev/ttyACM1
 
 Furthermore, if you have Mega 2560, it is likely that you have it for all
-projects you make. You can put a shared configuration file to either::
+projects you make. You can put a shared configuration file to either:
 
-    1. /etc/ino.ini
-    2. ~/inorc
+1. /etc/ino.ini
+2. ~/inorc
 
 And it'll be used for setting default parameter values if they're not
 overriden by the local ``ino.ini`` or by explicit command-line switches.

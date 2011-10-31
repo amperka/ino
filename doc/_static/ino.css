@@ -1,0 +1,74 @@
+
+body {
+    font-family: 'Andada', serif;
+    font-size: 14pt;
+    color: #221;
+    line-height: 1.5em;
+}
+
+h1, h2, h3 {
+    font-family: 'Coda', sans-serif;
+}
+
+a { color: #1c9b9f; }
+a:hover { color: red; }
+a:visited { color: #6e5072; }
+
+.document {
+    width: 720px;
+    margin: 0 auto;
+}
+
+.footer {
+    font-style: italic;
+    color: #777;
+    width: 720px;
+    margin: 0 auto;
+}
+
+div.sphinxsidebar {
+    width: 720px;
+    float: none;
+    margin: 0 auto;
+}
+
+div.sphinxsidebarwrapper {
+    width: 240px;
+    margin-left: -260px;
+    float: left;
+    font-size: 12pt;
+}
+
+div.sphinxsidebarwrapper ul li { 
+    list-style-type: none; 
+    font-family: 'Coda', sans-serif;
+}
+
+div.sphinxsidebarwrapper ul { padding-left: 13px; }
+div.sphinxsidebarwrapper ul ul { padding-left: 0; }
+
+/* hide root TOC link */
+div.sphinxsidebarwrapper ul li a { display: none; }
+div.sphinxsidebarwrapper ul li ul li a { display: inline; }
+
+pre, tt {
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+tt {
+    color: black;
+    background-color: #eee;
+    padding: 0 0.5ex;
+}
+
+pre {
+    font-size: 12pt;
+    line-height: 1em;
+    border: 1px solid black;
+    padding: 1em;
+    background-color: #555;
+    color: #fea;
+}
+
+ul { padding-left: 0; }
+ul li { list-style-type: square; }
