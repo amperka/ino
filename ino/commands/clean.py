@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import os.path
 import shutil
 
 from ino.commands.base import Command
@@ -16,4 +17,5 @@ class Clean(Command):
     help_line = "Remove intermediate compilation files completely"
 
     def run(self, args):
-        shutil.rmtree(self.e['build_dir'])
+        if os.path.isdir(self.e.build_dir):
+            shutil.rmtree(self.e.build_dir)
