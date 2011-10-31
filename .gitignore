@@ -1,4 +1,7 @@
 *.pyc
 *~
 tags
+build
+dist
+ino.egg-info
 doc/.build
