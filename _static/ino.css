@@ -1,0 +1,106 @@
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: 'Andada', serif;
+    font-size: 14pt;
+    color: #221;
+    line-height: 1.5em;
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3 {
+    font-family: 'Coda', sans-serif;
+}
+
+a { color: #1c9b9f; }
+a:hover { color: red; }
+a:visited { color: #6e5072; }
+
+.headbar {
+    font-size: 12pt;
+    line-height: 1em;
+    background-color: #444;
+    color: #ccc;
+    font-family: 'Coda', sans-serif;
+    padding: 1em;
+    margin-bottom: 60px;
+    overflow: hidden;
+}
+
+.headbar a,
+.headbar a:hover,
+.headbar a:visited {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.amperka { float: right; text-align: right; }
+.amperka img { vertical-align: middle; }
+
+.document {
+    width: 720px;
+    margin: 0 auto;
+}
+
+.footer {
+    font-style: italic;
+    color: #777;
+    width: 720px;
+    margin: 0 auto;
+}
+
+div.sphinxsidebar {
+    width: 720px;
+    float: none;
+    margin: 0 auto;
+}
+
+div.sphinxsidebarwrapper {
+    width: 240px;
+    margin-left: -260px;
+    float: left;
+    font-size: 12pt;
+}
+
+div.sphinxsidebarwrapper ul li { 
+    list-style-type: none; 
+    font-family: 'Coda', sans-serif;
+}
+
+div.sphinxsidebarwrapper ul { padding-left: 13px; }
+div.sphinxsidebarwrapper ul ul { padding-left: 0; }
+
+/* hide root TOC link */
+div.sphinxsidebarwrapper ul li a { display: none; }
+div.sphinxsidebarwrapper ul li ul li a { display: inline; }
+
+pre, tt {
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+tt {
+    color: black;
+    background-color: #eee;
+    padding: 0 0.5ex;
+}
+
+pre {
+    font-size: 12pt;
+    line-height: 1em;
+    border: 1px solid black;
+    padding: 1em;
+    background-color: #555;
+    color: #fea;
+}
+
+ul { padding-left: 0; }
+ul li { list-style-type: square; }
+
+.footer {
+    padding-bottom: 1em;
+}

@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,7 +9,7 @@
     
     <title>Quick start &mdash; Ino 0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,20 +24,46 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ino 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="Ino 0.1 documentation" href="index.html" />
+<link rel="stylesheet" type="text/css" href="_static/ino.css">
+<link href='http://fonts.googleapis.com/css?family=Coda' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Andada' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700' rel='stylesheet' type='text/css'>
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="index.html">Ino 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<div class="headbar">
+    <div class="amperka">
+        Developed by Amperka ::
+        <a href="http://amperka.ru">Arduino</a> in&nbsp;&nbsp;<img src="_static/ru.png" title="Flag of Russian Federation, you know"/>
+    </div>
+    <div class="github">
+        <a href="https://github.com/amperka/ino">Fork the project on GitHub</a>
+    </div>
+</div>
+
+
+<div class="sphinxsidebar">
+    <div class="sphinxsidebarwrapper">
+        <a href="/"><img src="_static/logo.png"/></a>
+        <ul>
+<li><a class="reference internal" href="#">Quick start</a><ul>
+<li><a class="reference internal" href="#creating-a-project">Creating a project</a></li>
+<li><a class="reference internal" href="#building">Building</a></li>
+<li><a class="reference internal" href="#uploading">Uploading</a></li>
+<li><a class="reference internal" href="#serial-communication">Serial communication</a></li>
+<li><a class="reference internal" href="#tweaking-parameters">Tweaking parameters</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</div>
+
 
     <div class="document">
+    
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
@@ -223,6 +248,10 @@ is set with <tt class="docutils literal"><span class="pre">--serial-port</span><
 $ ino upload -m mega2560 -p /dev/ttyACM1
 $ ino serial -p /dev/ttyACM1</pre>
 </div>
+<p>For the full list of board names refer to <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">build</span> <span class="pre">--help</span></tt>.</p>
+</div>
+<div class="section" id="configuration-files">
+<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
 <p>It can be annoying to provide these switches over and over again. So
 you can save them in <tt class="docutils literal"><span class="pre">ino.ini</span></tt> file in project directory. Put
 following lines to the <tt class="docutils literal"><span class="pre">ino.ini</span></tt>:</p>
@@ -247,9 +276,10 @@ serial-port = /dev/ttyACM1</pre>
 </div>
 <p>Furthermore, if you have Mega 2560, it is likely that you have it for all
 projects you make. You can put a shared configuration file to either:</p>
-<div class="highlight-python"><pre>1. /etc/ino.ini
-2. ~/inorc</pre>
-</div>
+<ol class="arabic simple">
+<li>/etc/ino.ini</li>
+<li>~/inorc</li>
+</ol>
 <p>And it&#8217;ll be used for setting default parameter values if they&#8217;re not
 overriden by the local <tt class="docutils literal"><span class="pre">ino.ini</span></tt> or by explicit command-line switches.</p>
 </div>
@@ -259,50 +289,8 @@ overriden by the local <tt class="docutils literal"><span class="pre">ino.ini</s
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Quick start</a><ul>
-<li><a class="reference internal" href="#creating-a-project">Creating a project</a></li>
-<li><a class="reference internal" href="#building">Building</a></li>
-<li><a class="reference internal" href="#uploading">Uploading</a></li>
-<li><a class="reference internal" href="#serial-communication">Serial communication</a></li>
-<li><a class="reference internal" href="#tweaking-parameters">Tweaking parameters</a></li>
-</ul>
-</li>
-</ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/quickstart.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="index.html">Ino 0.1 documentation</a> &raquo;</li> 
-      </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Amperka Team.

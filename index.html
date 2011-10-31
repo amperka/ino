@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,9 +7,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Features &mdash; Ino 0.1 documentation</title>
+    <title>Ino &mdash; Ino 0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,43 +24,68 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ino 0.1 documentation" href="#" /> 
+    <link rel="top" title="Ino 0.1 documentation" href="#" />
+<link rel="stylesheet" type="text/css" href="_static/ino.css">
+<link href='http://fonts.googleapis.com/css?family=Coda' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Andada' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700' rel='stylesheet' type='text/css'>
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="#">Ino 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<div class="headbar">
+    <div class="amperka">
+        Developed by Amperka ::
+        <a href="http://amperka.ru">Arduino</a> in&nbsp;&nbsp;<img src="_static/ru.png" title="Flag of Russian Federation, you know"/>
+    </div>
+    <div class="github">
+        <a href="https://github.com/amperka/ino">Fork the project on GitHub</a>
+    </div>
+</div>
+
+
+<div class="sphinxsidebar">
+    <div class="sphinxsidebarwrapper">
+        <a href="/"><img src="_static/logo.png"/></a>
+        <ul>
+<li><a class="reference internal" href="#">Ino</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#getting-help">Getting Help</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</div>
+
 
     <div class="document">
+    
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
-  <p>Ino is a command line toolkit for working with Arduino hardware.</p>
+  <div class="section" id="ino">
+<h1>Ino<a class="headerlink" href="#ino" title="Permalink to this headline">¶</a></h1>
+<p>Ino is a command line toolkit for working with Arduino hardware</p>
 <p>It allows you to:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li>Quickly create new projects</li>
 <li>Build a firmware from multiple source files and libraries</li>
 <li>Upload the firmware to a device</li>
 <li>Perform serial communication with a device (aka serial monitor)</li>
 </ul>
-</div></blockquote>
 <p>Ino may replace Arduino IDE UI if you prefer to work with command
 line and an editor of your choice or if you want to integrate Arduino
 build process to 3-rd party IDE.</p>
 <p>Ino is based on <tt class="docutils literal"><span class="pre">make</span></tt> to perform builds. However Makefiles are
 generated automatically and you&#8217;ll never see them if you don&#8217;t want to.</p>
 <div class="section" id="features">
-<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
-<blockquote>
-<div><ul class="simple">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
 <li>Simple. No build scripts are necessary.</li>
 <li>Out-of-source builds. Directories with source files are not
 cluttered with intermediate object files.</li>
@@ -78,10 +102,9 @@ If nothing has changed, nothing is build.</li>
 machine-specific info like used Arduino model, Arduino distribution
 path, etc just once.</li>
 </ul>
-</div></blockquote>
 </div>
 <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>With python setup tools:</p>
 <div class="highlight-python"><pre>$ sudo pip install ino
 # ... or ...
@@ -93,20 +116,17 @@ $ export PATH=`pwd`/ino/bin</pre>
 </div>
 </div>
 <div class="section" id="requirements">
-<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
-<blockquote>
-<div><ul class="simple">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
 <li>Python 2.6+</li>
 <li>Arduino IDE distribution</li>
 <li><tt class="docutils literal"><span class="pre">make</span></tt> and <tt class="docutils literal"><span class="pre">avr-gcc</span></tt> for building</li>
 <li><tt class="docutils literal"><span class="pre">picocom</span></tt> for serial communication</li>
 </ul>
-</div></blockquote>
 </div>
 <div class="section" id="limitations">
-<h1>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h1>
-<blockquote>
-<div><ul class="simple">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
 <li>As for current version, ino works only in Linux. However it was created
 with other platform users in mind, so it will eventually get
 cross-platform support. Help from Windows- and MacOS- developers is
@@ -114,70 +134,28 @@ much appreciated.</li>
 <li>Ino is not yet well tested with release candidate of upcoming Arduino 1.0
 software. Although it should be compatible.</li>
 </ul>
-</div></blockquote>
 </div>
 <div class="section" id="getting-help">
-<h1>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h1>
-<blockquote>
-<div><ul class="simple">
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
 <li>Take a look at <a class="reference external" href="http://inotool.org/quickstart">Quick start tutorial</a>.</li>
 <li>Run <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">--help</span></tt>.</li>
 <li>Post <a class="reference external" href="http://github.com/amperka/ino/issues">issues to GitHub</a>.</li>
 </ul>
-</div></blockquote>
 </div>
 <div class="section" id="license">
-<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>If not stated otherwise ino is distributed in terms of MIT software license.
 See MIT-LICENSE.txt in the distribution for details.</p>
+</div>
 </div>
 
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Features</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#limitations">Limitations</a></li>
-<li><a class="reference internal" href="#getting-help">Getting Help</a></li>
-<li><a class="reference internal" href="#license">License</a></li>
-</ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/index.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="#">Ino 0.1 documentation</a> &raquo;</li> 
-      </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Amperka Team.
