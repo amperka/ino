@@ -1,0 +1,4 @@
+include README.rst
+include requirements.txt
+graft ino/make
+graft ino/templates

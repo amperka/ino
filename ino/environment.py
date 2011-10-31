@@ -14,7 +14,7 @@ from ino.exc import Abort
 
 class Environment(dict):
 
-    templates_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
+    templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
     build_dir = '.build'
     src_dir = 'src'
     lib_dir = 'lib'

@@ -89,7 +89,7 @@ class Build(Command):
         }
 
     def create_jinja(self):
-        templates_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'make')
+        templates_dir = os.path.join(os.path.dirname(__file__), '..', 'make')
         self.jenv = jinja2.Environment(
             loader=jinja2.FileSystemLoader(templates_dir),
             undefined=StrictUndefined, # bark on Undefined render

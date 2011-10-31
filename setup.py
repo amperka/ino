@@ -1,26 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-
 from setuptools import setup
 
+install_requires = open("requirements.txt").read().split('\n')
+readme_content = open("README.rst").read()
 
-install_requires = []
-try:
-    readme_content = open("requirements.txt").readlines()
-except:
-    readme_content = ""
+def gen_data_files(package_dir, subdir):
+    import os.path
+    results = []
+    for root, dirs, files in os.walk(os.path.join(package_dir, subdir)):
+        results.extend([os.path.join(root, f)[len(package_dir)+1:] for f in files])
+    return results
 
-try:
-    readme_content = open("README.rst").read()
-except:
-    readme_content = ""
-
+ino_package_data = gen_data_files('ino', 'make') + gen_data_files('ino', 'templates')
 
 setup(
     name='ino',
-    version='0.1.0',
+    version='0.1.8',
     description='Command line toolkit for working with Arduino hardware',
     long_description=readme_content,
     author='Victor Nakoryakov, Amperka Team',
@@ -30,6 +27,7 @@ setup(
     url='http://inotool.org',
     packages=['ino', 'ino.commands'],
     scripts=['bin/ino'],
+    package_data={'ino': ino_package_data},
     install_requires=install_requires,
     classifiers=[
         "Development Status :: 4 - Beta",
