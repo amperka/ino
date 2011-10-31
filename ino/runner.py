@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8; -*-
 
+"""\
+Ino is a command-line toolkit for working with Arduino hardware.
+
+It is intended to replace Arduino IDE UI for those who prefer to work in
+terminal or want to integrate Arduino development in a 3rd party IDE.
+
+Ino can build sketches, libraries, upload firmwares, establish
+serial-communication. For this it is split in a bunch of subcommands, like git
+or mercurial do. The full list is provided below. You may run any of them with
+--help to get further help. E.g.:
+
+    ino build --help
+"""
+
 import sys
 import os.path
 import argparse
@@ -34,12 +48,12 @@ def main():
     conf = configure()
     conf_scalars = dict((key, conf[key]) for key in conf.scalars)
 
-    parser = argparse.ArgumentParser(prog='ino', description='Arduino command line environment')
+    parser = argparse.ArgumentParser(prog='ino', formatter_class=FlexiFormatter, description=__doc__)
     subparsers = parser.add_subparsers()
     is_command = lambda x: inspect.isclass(x) and issubclass(x, Command) and x != Command
     commands = [cls(e) for _, cls in inspect.getmembers(ino.commands, is_command)]
     for cmd in commands:
-        p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter)
+        p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter, help=cmd.help_line)
         cmd.setup_arg_parser(p)
         conf_defaults = conf_scalars.copy()
         conf_defaults.update(conf.get(cmd.name, {}))

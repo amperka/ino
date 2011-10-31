@@ -8,10 +8,17 @@ from ino.exc import Abort
 
 
 class Init(Command):
+    """
+    Setup a new project in the current directory.
+
+    The directory must be empty.
+    """
 
     name = 'init'
+    help_line = "Setup a new project in the current directory"
 
     def setup_arg_parser(self, parser):
+        super(Init, self).setup_arg_parser(parser)
         parser.add_argument('-t', '--template', default='blink', help='Project template to use')
 
     def run(self, args):

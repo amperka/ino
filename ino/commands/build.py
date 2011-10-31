@@ -16,10 +16,28 @@ from ino.exc import Abort
 
 
 class Build(Command):
+    """
+    Build a project in the current directory and produce a ready-to-upload
+    firmware file.
+
+    The project is expected to have `src' subdirectroy where all its sources
+    are located. This directory is scanned recursively to find
+    *.[c|cpp|pde|ino] files. They are compiled and linked into resulting
+    firmware hex-file.
+
+    Also any external library dependencies are tracked automatically. If a
+    source file includes any library found among standard Arduino libraries or
+    a library placed in `lib' subdirectory of the project, the library gets
+    build too.
+
+    Build artifacts are placed in `.build' subdirectory of the project.
+    """
 
     name = 'build'
+    help_line = "Build firmware from the current directory project"
 
     def setup_arg_parser(self, parser):
+        super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
 

@@ -14,10 +14,20 @@ from ino.exc import Abort
 
 
 class Upload(Command):
+    """
+    Upload built firmware to the device.
+
+    The firmware must be already explicitly built with `ino build'. If current
+    device firmare reads/writes serial port extensively, upload may fail. In
+    that case try to retry few times or upload just after pushing Reset button
+    on Arduino board.
+    """
 
     name = 'upload'
+    help_line = "Upload built firmware to the device"
 
     def setup_arg_parser(self, parser):
+        super(Upload, self).setup_arg_parser(parser)
         parser.add_argument('-p', '--serial-port', metavar='PORT', default='/dev/ttyACM0', 
                             help='Serial port to upload firmware to\n(default: %(default)s)')
 
