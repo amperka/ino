@@ -41,7 +41,7 @@
 {{ libpath }} : {{ libobjs }}
 	@echo {{ ('Linking ' ~ name|libname) |colorize('green') }}
 	@{{ e.ar }} rcs $@ $^
-{% do add_to.append(libpath) %}
+{% do add_to.insert(0, libpath) %}
 {% endmacro %}
 
 {#
