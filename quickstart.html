@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick start &mdash; Ino 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ino 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">Ino 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<p>Learn how to work with ino in few minutes.</p>
+<div class="section" id="creating-a-project">
+<h2>Creating a project<a class="headerlink" href="#creating-a-project" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s create a simple project:</p>
+<div class="highlight-python"><pre>$ mkdir beep
+$ cd beep
+$ ino init -t blink</pre>
+</div>
+<p>Here we&#8217;ve created a new directory for our project and initialized project
+skeleton with <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">init</span></tt> command. We chose to use <em>blink</em> as a project
+template. That will create a simple sketch for LED blinking on pin 13.
+Lets see what we&#8217;ve got:</p>
+<div class="highlight-python"><pre>$ tree
+.
+├── lib
+└── src
+    └── sketch.pde
+
+$ cat src/sketch.pde
+
+#define LED_PIN 13
+
+void setup()
+{
+    pinMode(LED_PIN, OUTPUT);
+}
+
+void loop()
+{
+    digitalWrite(LED_PIN, HIGH);
+    delay(100);
+    digitalWrite(LED_PIN, LOW);
+    delay(900);
+}</pre>
+</div>
+<p>Here we have two directories. <tt class="docutils literal"><span class="pre">src</span></tt> is a source directory where we can
+put our project&#8217;s <tt class="docutils literal"><span class="pre">*.[c|cpp|pde|h|hpp]</span></tt> source files. <tt class="docutils literal"><span class="pre">sketch.pde</span></tt>
+was created for us, so we have a starting point. <tt class="docutils literal"><span class="pre">lib</span></tt> is a directory
+where we may put 3-rd party libraries if we would want.</p>
+</div>
+<div class="section" id="building">
+<h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
+<p>Lets build it:</p>
+<div class="highlight-python"><pre>$ ino build
+Searching for Board description file (boards.txt) ... /usr/local/share/arduino/hardware/arduino/boards.txt
+Searching for Arduino core library ... /usr/local/share/arduino/hardware/arduino/cores/arduino
+Searching for Arduino standard libraries ... /usr/local/share/arduino/libraries
+Searching for Arduino lib version file (version.txt) ... /usr/local/share/arduino/lib/version.txt
+Detecting Arduino software version ...  22
+Searching for avr-gcc ... /usr/bin/avr-gcc
+Searching for avr-g++ ... /usr/bin/avr-g++
+Searching for avr-ar ... /usr/bin/avr-ar
+Searching for avr-objcopy ... /usr/bin/avr-objcopy
+Scanning dependencies of src
+src/sketch.cpp
+arduino/wiring_shift.c
+arduino/wiring.c
+arduino/WInterrupts.c
+arduino/wiring_digital.c
+arduino/wiring_pulse.c
+arduino/wiring_analog.c
+arduino/pins_arduino.c
+arduino/HardwareSerial.cpp
+arduino/WString.cpp
+arduino/main.cpp
+arduino/Print.cpp
+arduino/WMath.cpp
+arduino/Tone.cpp
+Linking libcore.a
+Linking firmware.elf
+Converting to firmware.hex</pre>
+</div>
+<p>Whew! A lot of work has been done behind the scenes for a single command.
+It&#8217;s at most about finding necessary tools and directories, and compiling
+the standard core library. Actually you shouldn&#8217;t care. The consequence
+is that we&#8217;ve got <tt class="docutils literal"><span class="pre">firmware.hex</span></tt>—ready to upload binary file.</p>
+</div>
+<div class="section" id="uploading">
+<h2>Uploading<a class="headerlink" href="#uploading" title="Permalink to this headline">¶</a></h2>
+<p>Lets upload it:</p>
+<div class="highlight-python"><pre>$ ino upload
+Searching for stty ... /bin/stty
+Searching for avrdude ... /usr/local/share/arduino/hardware/tools/avrdude
+Searching for avrdude.conf ... /usr/local/share/arduino/hardware/tools/avrdude.conf
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.00s
+
+avrdude: Device signature = 0x1e950f
+avrdude: reading input file ".build/firmware.hex"
+avrdude: writing flash (428 bytes):
+
+Writing | ################################################## | 100% 0.08s
+
+avrdude: 428 bytes of flash written
+avrdude: verifying flash memory against .build/firmware.hex:
+avrdude: load data flash data from input file .build/firmware.hex:
+avrdude: input file .build/firmware.hex contains 428 bytes
+avrdude: reading on-chip flash data:
+
+Reading | ################################################## | 100% 0.06s
+
+avrdude: verifying ...
+avrdude: 428 bytes of flash verified
+
+avrdude: safemode: Fuses OK
+
+avrdude done.  Thank you.</pre>
+</div>
+<p>Again, quite much output, but the job is done. Arduino flashes with its
+buil-in LED on pin 13.</p>
+</div>
+<div class="section" id="serial-communication">
+<h2>Serial communication<a class="headerlink" href="#serial-communication" title="Permalink to this headline">¶</a></h2>
+<p>OK, now lets deal with serial communication a bit. With editor of your choice change
+<tt class="docutils literal"><span class="pre">src/sketch.pde</span></tt> to:</p>
+<div class="highlight-python"><pre>void setup()
+{
+    Serial.begin(9600);
+}
+
+void loop()
+{
+    Serial.println(millis());
+    delay(1000);
+}</pre>
+</div>
+<p>This should transmit number of milliseconds spent from power up every second via
+serial port. Lets build it:</p>
+<div class="highlight-python"><pre>$ ino build
+Scanning dependencies of src
+src/sketch.cpp
+Linking firmware.elf
+Converting to firmware.hex</pre>
+</div>
+<p>As you can see much fewer of steps have been performed behind the scenes. It is
+because only things that have been changed are taken into account. This boosts
+up the build.</p>
+<p>Lets upload it with <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">upload</span></tt>. When uploading is done lets connect to the
+device with serial monitor to see what it prints:</p>
+<div class="highlight-python"><pre>$ ino serial
+Searching for Serial monitor (picocom) ... /usr/bin/picocom
+picocom v1.4
+
+port is        : /dev/ttyACM0
+flowcontrol    : none
+baudrate is    : 9600
+parity is      : none
+databits are   : 8
+escape is      : C-a
+noinit is      : no
+noreset is     : no
+nolock is      : yes
+send_cmd is    : ascii_xfr -s -v -l10
+receive_cmd is : rz -vv
+
+Terminal ready
+0
+1000
+2004
+3009
+4014</pre>
+</div>
+<p>That&#8217;s what we want! Press Ctrl+A Ctrl+X to exit.</p>
+</div>
+<div class="section" id="tweaking-parameters">
+<h2>Tweaking parameters<a class="headerlink" href="#tweaking-parameters" title="Permalink to this headline">¶</a></h2>
+<p>All examples were done in assumption that you have Arduino Uno and it is
+available on default port. Now consider you have Arduino Mega 2560 and
+it is available on port <tt class="docutils literal"><span class="pre">/dev/ttyACM1</span></tt>. We have to specify this for
+our build steps as command-line switches.</p>
+<p>Board model may be set with <tt class="docutils literal"><span class="pre">--board-model</span></tt> or <tt class="docutils literal"><span class="pre">-m</span></tt> switch. Port
+is set with <tt class="docutils literal"><span class="pre">--serial-port</span></tt> or <tt class="docutils literal"><span class="pre">-p</span></tt> switch. So lets do it:</p>
+<div class="highlight-python"><pre>$ ino build -m mega2560
+$ ino upload -m mega2560 -p /dev/ttyACM1
+$ ino serial -p /dev/ttyACM1</pre>
+</div>
+<p>It can be annoying to provide these switches over and over again. So
+you can save them in <tt class="docutils literal"><span class="pre">ino.ini</span></tt> file in project directory. Put
+following lines to the <tt class="docutils literal"><span class="pre">ino.ini</span></tt>:</p>
+<div class="highlight-python"><pre>[build]
+board-model = mega2560
+
+[upload]
+board-model = mega2560
+serial-port = /dev/ttyACM1
+
+[serial]
+serial-port = /dev/ttyACM1</pre>
+</div>
+<p>Now you can build, upload and communicate via serial not having to provide
+any parameters. Well, in most cases if you build for Mega 2560, you will
+want to upload to Mega 2560 as well. The same about serial port setting.
+So to don&#8217;t repeat settings for different commands shared switches could
+be moved up to an unnamed section. So having just following lines in <tt class="docutils literal"><span class="pre">ino.ini</span></tt>
+is enough:</p>
+<div class="highlight-python"><pre>board-model = mega2560
+serial-port = /dev/ttyACM1</pre>
+</div>
+<p>Furthermore, if you have Mega 2560, it is likely that you have it for all
+projects you make. You can put a shared configuration file to either:</p>
+<div class="highlight-python"><pre>1. /etc/ino.ini
+2. ~/inorc</pre>
+</div>
+<p>And it&#8217;ll be used for setting default parameter values if they&#8217;re not
+overriden by the local <tt class="docutils literal"><span class="pre">ino.ini</span></tt> or by explicit command-line switches.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick start</a><ul>
+<li><a class="reference internal" href="#creating-a-project">Creating a project</a></li>
+<li><a class="reference internal" href="#building">Building</a></li>
+<li><a class="reference internal" href="#uploading">Uploading</a></li>
+<li><a class="reference internal" href="#serial-communication">Serial communication</a></li>
+<li><a class="reference internal" href="#tweaking-parameters">Tweaking parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/quickstart.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">Ino 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Amperka Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
+  </body>
+</html>
