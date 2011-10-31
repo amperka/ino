@@ -41,3 +41,15 @@ def list_subdirs(dirname, recursive=False, exclude=[]):
             list_subdirs(d, recursive=True, exclude=exclude) for d in dirs)
         dirs.extend(sub)
     return dirs
+
+
+def format_available_options(items, head_width, head_color='cyan', 
+                             default=None, default_mark="[DEFAULT]", 
+                             default_mark_color='red'):
+    from ino.filters import colorize
+    default_mark = colorize(default_mark + ' ', default_mark_color)
+    lines = ['%s: %s%s' % (colorize('%%%ds' % head_width % key, head_color), 
+                           default_mark if key == default else '', 
+                           val) 
+             for key, val in items]
+    return '\n'.join(lines)

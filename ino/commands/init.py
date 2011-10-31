@@ -3,8 +3,11 @@
 import os.path
 import shutil
 
+from configobj import ConfigObj
+
 from ino.commands.base import Command
 from ino.exc import Abort
+from ino.utils import format_available_options, list_subdirs
 
 
 class Init(Command):
@@ -17,13 +20,30 @@ class Init(Command):
     name = 'init'
     help_line = "Setup a new project in the current directory"
 
+    default_template = 'empty'
+
     def setup_arg_parser(self, parser):
         super(Init, self).setup_arg_parser(parser)
-        parser.add_argument('-t', '--template', default='blink', help='Project template to use')
+        parser.add_argument('-t', '--template', default=self.default_template, 
+                            help='Project template to use')
+
+        parser.epilog = "Available probject templates:\n\n"
+
+        template_items = []
+        for tdir in list_subdirs(self.e.templates_dir):
+            try:
+                description = ConfigObj(os.path.join(tdir, 'manifest.ini'))['description']
+            except KeyError:
+                description = ''
+            template_items.append((os.path.basename(tdir), description))
+
+        parser.epilog += format_available_options(template_items, head_width=12, 
+                                                  default=self.default_template)
 
     def run(self, args):
         try:
-            copytree(os.path.join(self.e['templates_dir'], args.template), '.')
+            copytree(os.path.join(self.e['templates_dir'], args.template),
+                     '.', ignore=lambda *args: ['manifest.ini'])
         except shutil.Error as e:
             raise Abort(str(e))
 

@@ -48,12 +48,19 @@ def main():
     conf = configure()
     conf_scalars = dict((key, conf[key]) for key in conf.scalars)
 
+    try:
+        current_command = sys.argv[1]
+    except IndexError:
+        current_command = None
+
     parser = argparse.ArgumentParser(prog='ino', formatter_class=FlexiFormatter, description=__doc__)
     subparsers = parser.add_subparsers()
     is_command = lambda x: inspect.isclass(x) and issubclass(x, Command) and x != Command
     commands = [cls(e) for _, cls in inspect.getmembers(ino.commands, is_command)]
     for cmd in commands:
         p = subparsers.add_parser(cmd.name, formatter_class=FlexiFormatter, help=cmd.help_line)
+        if current_command != cmd.name:
+            continue
         cmd.setup_arg_parser(p)
         conf_defaults = conf_scalars.copy()
         conf_defaults.update(conf.get(cmd.name, {}))
@@ -61,6 +68,9 @@ def main():
 
     args = parser.parse_args()
     e.process_args(args)
+
+    if current_command not in 'clean init' and not os.path.isdir(e.build_dir):
+        os.mkdir(e.build_dir)
 
     try:
         args.func(args)

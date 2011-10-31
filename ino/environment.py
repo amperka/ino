@@ -8,6 +8,7 @@ import pickle
 from collections import OrderedDict
 
 from ino.filters import colorize
+from ino.utils import format_available_options
 from ino.exc import Abort
 
 
@@ -27,13 +28,8 @@ class Environment(dict):
 
     default_board_model = 'uno'
 
-    def __init__(self, *args, **kwargs):
-        super(Environment, self).__init__(*args, **kwargs)
-        if not os.path.isdir(self.build_dir):
-            os.mkdir(self.build_dir)
-
     def dump(self):
-        if not os.path.exists(self.build_dir):
+        if not os.path.isdir(self.build_dir):
             return
         with open(self.dump_filepath, 'wb') as f:
             pickle.dump(self.items(), f)
@@ -166,13 +162,9 @@ class Environment(dict):
                             help='Arduino board model. See below.')
 
         if boards:
-            default_mark = colorize('[DEFAULT] ', 'red')
-            board_list = ['%s: %s%s' % (colorize('%12s' % key, 'cyan'), 
-                                        default_mark if key == self.default_board_model else '', 
-                                        val['name']) 
-                          for key, val in boards.iteritems()]
-
-            epilog = '\n'.join(['Supported Arduino board models:\n'] + board_list)
+            board_map = [(key, val['name']) for key, val in boards.iteritems()]
+            epilog = 'Supported Arduino board models:\n\n'
+            epilog += format_available_options(board_map, head_width=12, default=self.default_board_model)
         else:
             epilog = "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
                      "Use --arduino-dist option to specify its location."
