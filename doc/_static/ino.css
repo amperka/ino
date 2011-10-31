@@ -1,9 +1,16 @@
 
 body {
+    padding: 0;
+    margin: 0;
+}
+
+body {
     font-family: 'Andada', serif;
     font-size: 14pt;
     color: #221;
     line-height: 1.5em;
+    padding: 0;
+    margin: 0;
 }
 
 h1, h2, h3 {
@@ -13,6 +20,27 @@ h1, h2, h3 {
 a { color: #1c9b9f; }
 a:hover { color: red; }
 a:visited { color: #6e5072; }
+
+.headbar {
+    font-size: 12pt;
+    line-height: 1em;
+    background-color: #444;
+    color: #ccc;
+    font-family: 'Coda', sans-serif;
+    padding: 1em;
+    margin-bottom: 60px;
+    overflow: hidden;
+}
+
+.headbar a,
+.headbar a:hover,
+.headbar a:visited {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.amperka { float: right; text-align: right; }
+.amperka img { vertical-align: middle; }
 
 .document {
     width: 720px;
