@@ -66,7 +66,8 @@ class Build(Command):
         self.e.find_tool('ar', ['avr-ar'], human_name='avr-ar')
         self.e.find_tool('objcopy', ['avr-objcopy'], human_name='avr-objcopy')
 
-    def setup_flags(self, board):
+    def setup_flags(self, board_key):
+        board = self.e.board_model(board_key)
         mcu = '-mmcu=' + board['build']['mcu']
         self.e['cflags'] = SpaceList([
             mcu,

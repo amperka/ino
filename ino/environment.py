@@ -130,7 +130,7 @@ class Environment(dict):
         boards_txt = self.find_arduino_file('boards.txt', ['hardware', 'arduino'], 
                                             human_name='Board description file (boards.txt)')
 
-        self['board_models'] = BoardModelDict()
+        self['board_models'] = OrderedDict()
         with open(boards_txt) as f:
             for line in f:
                 line = line.strip()
@@ -148,6 +148,9 @@ class Environment(dict):
                 subdict[multikey[-1]] = val
 
         return self['board_models']
+
+    def board_model(self, key):
+        return self.board_models()[key]
     
     def add_board_model_arg(self, parser):
         try:
@@ -157,7 +160,6 @@ class Environment(dict):
 
         parser.add_argument('-m', '--board-model', metavar='MODEL', 
                             default=self.default_board_model,
-                            type=boards,
                             choices=boards.keys(),
                             help='Arduino board model. See below.')
 
@@ -179,14 +181,3 @@ class Environment(dict):
         arduino_dist = getattr(args, 'arduino_dist', None)
         if arduino_dist:
             self['arduino_dist_dir'] = arduino_dist
-
-
-class BoardModelDict(OrderedDict):
-    def __call__(self, model):
-        try:
-            return self[model]
-        except KeyError:
-            raise argparse.ArgumentTypeError("%s is not a valid board model" % model)
-
-    def __hash__(self):
-        return hash(tuple(self.keys()))

@@ -42,7 +42,7 @@ class Upload(Command):
     def run(self, args):
         self.discover()
         port = args.serial_port
-        board = args.board_model
+        board = self.e.board_model(args.board_model)
 
         protocol = board['upload']['protocol']
         if protocol == 'stk500':

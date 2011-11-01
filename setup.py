@@ -17,7 +17,7 @@ ino_package_data = gen_data_files('ino', 'make') + gen_data_files('ino', 'templa
 
 setup(
     name='ino',
-    version='0.1.8',
+    version='0.1.9',
     description='Command line toolkit for working with Arduino hardware',
     long_description=readme_content,
     author='Victor Nakoryakov, Amperka Team',
