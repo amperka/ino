@@ -277,10 +277,13 @@ serial-port = /dev/ttyACM1</pre>
 projects you make. You can put a shared configuration file to either:</p>
 <ol class="arabic simple">
 <li>/etc/ino.ini</li>
-<li>~/inorc</li>
+<li>~/.inorc</li>
 </ol>
 <p>And it&#8217;ll be used for setting default parameter values if they&#8217;re not
 overriden by the local <tt class="docutils literal"><span class="pre">ino.ini</span></tt> or by explicit command-line switches.</p>
+<p>You can provide any arguments you use on command line in a configuration
+file. Just specify its long name without leading <tt class="docutils literal"><span class="pre">--</span></tt>.
+E.g. <tt class="docutils literal"><span class="pre">arduino-dist</span></tt> but not <tt class="docutils literal"><span class="pre">--arduino-dist</span></tt> or <tt class="docutils literal"><span class="pre">-d</span></tt>.</p>
 </div>
 </div>
 

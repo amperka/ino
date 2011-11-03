@@ -229,7 +229,11 @@ Furthermore, if you have Mega 2560, it is likely that you have it for all
 projects you make. You can put a shared configuration file to either:
 
 1. /etc/ino.ini
-2. ~/inorc
+2. ~/.inorc
 
 And it'll be used for setting default parameter values if they're not
 overriden by the local ``ino.ini`` or by explicit command-line switches.
+
+You can provide any arguments you use on command line in a configuration
+file. Just specify its long name without leading ``--``.
+E.g. ``arduino-dist`` but not ``--arduino-dist`` or ``-d``.
