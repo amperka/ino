@@ -20,25 +20,14 @@ import os.path
 import argparse
 import inspect
 
-from configobj import ConfigObj
-
 import ino.commands
 
 from ino.commands.base import Command
+from ino.conf import configure
 from ino.exc import Abort
 from ino.filters import colorize
 from ino.environment import Environment
 from ino.argparsing import FlexiFormatter
-
-
-def configure():
-    etc = ConfigObj('/etc/ino.ini')
-    home = ConfigObj(os.path.expanduser('~/.inorc'))
-    cwd = ConfigObj('ino.ini')
-    cfg = etc
-    cfg.merge(home)
-    cfg.merge(cwd)
-    return cfg
 
 
 def main():
@@ -46,7 +35,6 @@ def main():
     e.load()
 
     conf = configure()
-    conf_scalars = dict((key, conf[key]) for key in conf.scalars)
 
     try:
         current_command = sys.argv[1]
@@ -62,9 +50,7 @@ def main():
         if current_command != cmd.name:
             continue
         cmd.setup_arg_parser(p)
-        conf_defaults = conf_scalars.copy()
-        conf_defaults.update(conf.get(cmd.name, {}))
-        p.set_defaults(func=cmd.run, **conf_defaults)
+        p.set_defaults(func=cmd.run, **conf.as_dict(cmd.name))
 
     args = parser.parse_args()
     e.process_args(args)

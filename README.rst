@@ -25,7 +25,7 @@ Features
 * Out-of-source builds. Directories with source files are not
   cluttered with intermediate object files.
 * Support for ``*.pde`` and ``*.ino`` sketches as well as
-  raw ``*.c`` and ``*cpp``.
+  raw ``*.c`` and ``*.cpp``.
 * Automatic dependency tracking. Referred libraries are automatically
   included in the build process. Changes in ``*.h`` files lead
   to recompilation of sources which include them.
