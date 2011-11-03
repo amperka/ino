@@ -130,7 +130,8 @@ class Environment(dict):
         boards_txt = self.find_arduino_file('boards.txt', ['hardware', 'arduino'], 
                                             human_name='Board description file (boards.txt)')
 
-        self['board_models'] = OrderedDict()
+        self['board_models'] = BoardModels()
+        self['board_models'].default = self.default_board_model
         with open(boards_txt) as f:
             for line in f:
                 line = line.strip()
@@ -153,25 +154,14 @@ class Environment(dict):
         return self.board_models()[key]
     
     def add_board_model_arg(self, parser):
-        try:
-            boards = self.board_models()
-        except Abort:
-            boards = {}
+        help = '\n'.join([
+            "Arduino board model (default: %(default)s)",
+            "For a full list of supported models run:", 
+            "`ino list-models'"
+        ])
 
         parser.add_argument('-m', '--board-model', metavar='MODEL', 
-                            default=self.default_board_model,
-                            choices=boards.keys(),
-                            help='Arduino board model. See below.')
-
-        if boards:
-            board_map = [(key, val['name']) for key, val in boards.iteritems()]
-            epilog = 'Supported Arduino board models:\n\n'
-            epilog += format_available_options(board_map, head_width=12, default=self.default_board_model)
-        else:
-            epilog = "Board description file (boards.txt) not found, so board model list is unavailable.\n" \
-                     "Use --arduino-dist option to specify its location."
-
-        parser.epilog = epilog + (parser.epilog or '')
+                            default=self.default_board_model, help=help)
 
     def add_arduino_dist_arg(self, parser):
         parser.add_argument('-d', '--arduino-dist', metavar='PATH', 
@@ -181,3 +171,17 @@ class Environment(dict):
         arduino_dist = getattr(args, 'arduino_dist', None)
         if arduino_dist:
             self['arduino_dist_dir'] = arduino_dist
+
+        board_model = getattr(args, 'board_model', None)
+        if board_model:
+            all_models = self.board_models()
+            if board_model not in all_models:
+                print "Supported Arduino board models are:"
+                print all_models.format()
+                raise Abort('%s is not a valid board model' % board_model)
+
+
+class BoardModels(OrderedDict):
+    def format(self):
+        map = [(key, val['name']) for key, val in self.iteritems()]
+        return format_available_options(map, head_width=12, default=self.default)
