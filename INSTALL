@@ -1,0 +1,14 @@
+In order to install Ino from source tarball run:
+
+    make install
+
+By default Ino is installed into `/usr/local'. You can change this by setting
+PREFIX or DESTDIR variables.
+
+    * DESTDIR changes file system root (`/' by default)
+    * PREFIX sets installation prefix (`/usr/local` by default).
+
+Examples:
+
+    * make install DESTDIR=~/ino
+    * make install PREFIX=/usr
