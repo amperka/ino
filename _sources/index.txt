@@ -40,16 +40,17 @@ Features
 Installation
 ============
 
-With python setup tools::
-    
-    $ sudo pip install ino
-    # ... or ...
-    $ sudo easy_install ino
+From source:
 
-Or clone from GitHub::
+* `Download latest source tarball <http://pypi.python.org/pypi/ino/#downloads>`_
+* Or clone it from GitHub: ``git clone git://github.com/amperka/ino.git``
+* Do ``make install`` to perform installation under ``/usr/local``
+* Or see ``INSTALL`` for instructions on changing destination directory
 
-    $ git clone git://github.com/amperka/ino.git
-    $ export PATH=`pwd`/ino/bin
+With Python setup tools:
+
+* Either ``pip install ino``
+* Or ``easy_install ino``
 
 Requirements
 ============
