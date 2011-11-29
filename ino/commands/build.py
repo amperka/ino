@@ -58,8 +58,15 @@ class Build(Command):
         if 'arduino_lib_version' not in self.e:
             with open(self.e['version.txt']) as f:
                 print 'Detecting Arduino software version ... ',
-                self.e['arduino_lib_version'] = v = int(f.read().strip())
-                print colorize(str(v), 'green')
+                version_string = f.read().strip()
+                # Extract numeric part. String could be something like:
+                #   0022
+                #   0022ubuntu0.1
+                #   0022-macosx-20110822
+                # in any case we need just 0022 casted to int, i.e. 22
+                version_int = int(re.split(r'\D', version_string)[0])
+                self.e['arduino_lib_version'] = version_int
+                print colorize("%s (%s)" % (version_int, version_string), 'green')
 
         self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
         self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')
