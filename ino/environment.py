@@ -5,7 +5,11 @@ import itertools
 import argparse
 import pickle
 
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Python < 2.7
+    from ordereddict import OrderedDict
 
 from ino.filters import colorize
 from ino.utils import format_available_options
