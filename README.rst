@@ -24,8 +24,9 @@ Features
 * Simple. No build scripts are necessary.
 * Out-of-source builds. Directories with source files are not
   cluttered with intermediate object files.
-* Support for ``*.pde`` and ``*.ino`` sketches as well as
+* Support for ``*.ino`` and ``*.pde`` sketches as well as
   raw ``*.c`` and ``*.cpp``.
+* Support for Arduino Software versions 1.x as well as 0.x.
 * Automatic dependency tracking. Referred libraries are automatically
   included in the build process. Changes in ``*.h`` files lead
   to recompilation of sources which include them.
@@ -67,8 +68,6 @@ Limitations
   with other platform users in mind, so it will eventually get
   cross-platform support. Help from Windows- and MacOS- developers is
   much appreciated.
-* Ino is not yet well tested with release candidate of upcoming Arduino 1.0
-  software. Although it should be compatible.
 
 Getting Help
 ============
