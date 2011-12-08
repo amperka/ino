@@ -4,6 +4,7 @@ import os.path
 import itertools
 import argparse
 import pickle
+import re
 
 try:
     from collections import OrderedDict
@@ -11,9 +12,38 @@ except ImportError:
     # Python < 2.7
     from ordereddict import OrderedDict
 
+from collections import namedtuple
+
 from ino.filters import colorize
 from ino.utils import format_available_options
 from ino.exc import Abort
+
+
+class Version(namedtuple('Version', 'major minor')):
+
+    regex = re.compile(ur'^\d+(\.\d+)?')
+
+    @classmethod
+    def parse(cls, s):
+        # Version could have various forms
+        #   0022
+        #   0022ubuntu0.1
+        #   0022-macosx-20110822
+        #   1.0
+        # We have to extract a 2-int-tuple (major, minor)
+        match = cls.regex.match(s)
+        if not match:
+            raise Abort("Could not parse Arduino library version: %s" % s)
+        v = match.group(0)
+        if v.startswith('0'):
+            return cls(0, int(v))
+        return cls(*map(int, v.split('.')))
+
+    def as_int(self):
+        return self.major * 100 + self.minor
+
+    def __str__(self):
+        return '%s.%s' % self
 
 
 class Environment(dict):
@@ -121,10 +151,10 @@ class Environment(dict):
             /usr/local/share/arduino/a/b/c
             /usr/share/arduino/a/b/c
         """
-        places = []
         if 'arduino_dist_dir' in self:
-            places.append(self['arduino_dist_dir'])
-        places.extend(self.arduino_dist_dir_guesses)
+            places = [self['arduino_dist_dir']]
+        else:
+            places = self.arduino_dist_dir_guesses
         return [os.path.join(p, *dirname_parts) for p in places]
 
     def board_models(self):

@@ -11,6 +11,7 @@ from jinja2.runtime import StrictUndefined
 import ino.filters
 
 from ino.commands.base import Command
+from ino.environment import Version
 from ino.filters import colorize
 from ino.utils import SpaceList, list_subdirs
 from ino.exc import Abort
@@ -43,30 +44,29 @@ class Build(Command):
         self.e.add_arduino_dist_arg(parser)
 
     def discover(self):
-        self.e.find_arduino_dir('arduino_core_dir', 
-                                ['hardware', 'arduino', 'cores', 'arduino'], 
-                                ['WProgram.h'], 
-                                'Arduino core library')
-
-        self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],
-                                human_name='Arduino standard libraries')
-
-        
         self.e.find_arduino_file('version.txt', ['lib'],
                                  human_name='Arduino lib version file (version.txt)')
 
         if 'arduino_lib_version' not in self.e:
             with open(self.e['version.txt']) as f:
                 print 'Detecting Arduino software version ... ',
-                version_string = f.read().strip()
-                # Extract numeric part. String could be something like:
-                #   0022
-                #   0022ubuntu0.1
-                #   0022-macosx-20110822
-                # in any case we need just 0022 casted to int, i.e. 22
-                version_int = int(re.split(r'\D', version_string)[0])
-                self.e['arduino_lib_version'] = version_int
-                print colorize("%s (%s)" % (version_int, version_string), 'green')
+                v_string = f.read().strip()
+                v = Version.parse(v_string)
+                self.e['arduino_lib_version'] = v
+                print colorize("%s (%s)" % (v, v_string), 'green')
+
+        self.e.find_arduino_dir('arduino_core_dir', 
+                                ['hardware', 'arduino', 'cores', 'arduino'], 
+                                ['Arduino.h'] if self.e.arduino_lib_version.major else 'WProgram.h', 
+                                'Arduino core library')
+
+        self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],
+                                human_name='Arduino standard libraries')
+
+        if self.e.arduino_lib_version.major:
+            self.e.find_arduino_dir('arduino_variants_dir',
+                                    ['hardware', 'arduino', 'variants'],
+                                    human_name='Arduino variants directory')
 
         self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
         self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')
@@ -84,9 +84,14 @@ class Build(Command):
             '-Os', 
             '-w',
             '-DF_CPU=' + board['build']['f_cpu'],
-            '-DARDUINO=' + str(self.e['arduino_lib_version']),
+            '-DARDUINO=' + str(self.e.arduino_lib_version.as_int()),
             '-I' + self.e['arduino_core_dir'],
         ])
+
+        if self.e.arduino_lib_version.major:
+            variant_dir = os.path.join(self.e.arduino_variants_dir, 
+                                       board['build']['variant'])
+            self.e.cflags.append('-I' + variant_dir)
 
         self.e['cxxflags'] = SpaceList(['-fno-exceptions'])
         self.e['elfflags'] = SpaceList(['-Os', '-Wl,--gc-sections', mcu])
