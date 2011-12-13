@@ -29,8 +29,8 @@ class Upload(Command):
 
     def setup_arg_parser(self, parser):
         super(Upload, self).setup_arg_parser(parser)
-        parser.add_argument('-p', '--serial-port', metavar='PORT', default='/dev/ttyACM0', 
-                            help='Serial port to upload firmware to\n(default: %(default)s)')
+        parser.add_argument('-p', '--serial-port', metavar='PORT',
+                            help='Serial port to upload firmware to\nTry to guess if not specified')
 
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
@@ -46,7 +46,7 @@ class Upload(Command):
     
     def run(self, args):
         self.discover()
-        port = args.serial_port
+        port = args.serial_port or self.e.guess_serial_port()
         board = self.e.board_model(args.board_model)
 
         protocol = board['upload']['protocol']

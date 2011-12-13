@@ -205,6 +205,28 @@ class Environment(dict):
         parser.add_argument('-d', '--arduino-dist', metavar='PATH', 
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
 
+    def guess_serial_port(self):
+        from glob import glob
+
+        print 'Guessing serial port ...',
+        system = platform.system()
+        if system == 'Linux':
+            patterns = ['/dev/ttyACM*', '/dev/ttyUSB*']
+        elif system == 'Darwin':
+            patterns = ['/dev/tty.usbmodem*', '/dev/tty.usbserial*']
+
+        for p in patterns:
+            matches = glob(p)
+            if not matches:
+                continue
+            result = matches[0]
+            print colorize(result, 'yellow')
+            return result
+
+        print colorize('FAILED', 'red')
+        raise Abort("No device matching following was found: %s" %
+                    (''.join(['\n  - ' + p for p in patterns])))
+
     def process_args(self, args):
         arduino_dist = getattr(args, 'arduino_dist', None)
         if arduino_dist:
