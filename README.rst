@@ -58,16 +58,15 @@ Requirements
 
 * Python 2.6+
 * Arduino IDE distribution
-* ``make`` and ``avr-gcc`` for building
 * ``picocom`` for serial communication
 
 Limitations
 ===========
 
-* As for current version, ino works only in Linux. However it was created
-  with other platform users in mind, so it will eventually get
-  cross-platform support. Help from Windows- and MacOS- developers is
-  much appreciated.
+* As for current version, ino works only in Linux and MacOS.
+  However it was created with other OS users in mind,
+  so it will eventually get full cross-platform support.
+  Help from Windows-developers is much appreciated.
 
 Getting Help
 ============
@@ -81,3 +80,17 @@ License
 
 If not stated otherwise ino is distributed in terms of MIT software license.
 See MIT-LICENSE.txt in the distribution for details.
+
+Changelog
+=========
+
+0.3.0
+    * MacOS support
+    * Serial port guess
+
+0.2.0
+    * Support for Arduino Software version 1.0
+
+0.1.x
+    * Initial release 
+    * Various bug fixes
