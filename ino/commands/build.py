@@ -4,6 +4,7 @@ import re
 import os.path
 import inspect
 import subprocess
+import platform
 import jinja2
 
 from jinja2.runtime import StrictUndefined
@@ -68,10 +69,23 @@ class Build(Command):
                                     ['hardware', 'arduino', 'variants'],
                                     human_name='Arduino variants directory')
 
-        self.e.find_tool('cc', ['avr-gcc'], human_name='avr-gcc')
-        self.e.find_tool('cxx', ['avr-g++'], human_name='avr-g++')
-        self.e.find_tool('ar', ['avr-ar'], human_name='avr-ar')
-        self.e.find_tool('objcopy', ['avr-objcopy'], human_name='avr-objcopy')
+        toolset = [
+            ('cc', 'avr-gcc'),
+            ('cxx', 'avr-g++'),
+            ('ar', 'avr-ar'),
+            ('objcopy', 'avr-objcopy'),
+        ]
+
+        # Linux has system-wide avr gcc toolset
+        # other platforms are bundled with it as a part of Arduino Software
+        system_wide = platform.system() == 'Linux'
+
+        for tool_key, tool_binary in toolset:
+            if system_wide:
+                self.e.find_tool(tool_key, [tool_binary], human_name=tool_binary)
+            else:
+                self.e.find_arduino_tool(tool_key, ['hardware', 'tools', 'avr', 'bin'], 
+                                         items=[tool_binary], human_name=tool_binary)
 
     def setup_flags(self, board_key):
         board = self.e.board_model(board_key)

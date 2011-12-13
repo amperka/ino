@@ -4,6 +4,7 @@ import os.path
 import itertools
 import argparse
 import pickle
+import platform
 import re
 
 try:
@@ -59,6 +60,9 @@ class Environment(dict):
         '/usr/local/share/arduino',
         '/usr/share/arduino',
     ]
+
+    if platform.system() == 'Darwin':
+        arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
 
     default_board_model = 'uno'
 
@@ -128,8 +132,8 @@ class Environment(dict):
     def find_dir(self, key, items, places, human_name=None):
         return self._find(key, items or ['.'], places, human_name, join=False)
 
-    def find_file(self, key, items, places=None, human_name=None):
-        return self._find(key, items, places, human_name, join=True)
+    def find_file(self, key, items=None, places=None, human_name=None):
+        return self._find(key, items or [key], places, human_name, join=True)
 
     def find_tool(self, key, items, places=None, human_name=None):
         return self.find_file(key, items, places or ['$PATH'], human_name)
@@ -137,11 +141,11 @@ class Environment(dict):
     def find_arduino_dir(self, key, dirname_parts, items=None, human_name=None):
         return self.find_dir(key, items, self._arduino_dist_places(dirname_parts), human_name)
 
-    def find_arduino_file(self, key, dirname_parts, human_name=None):
-        return self.find_file(key, [key], self._arduino_dist_places(dirname_parts), human_name)
+    def find_arduino_file(self, key, dirname_parts, items=None, human_name=None):
+        return self.find_file(key, items, self._arduino_dist_places(dirname_parts), human_name)
 
-    def find_arduino_tool(self, key, filename_parts, human_name=None):
-        return self.find_arduino_file(key, filename_parts, human_name)
+    def find_arduino_tool(self, key, filename_parts, items=None, human_name=None):
+        return self.find_arduino_file(key, filename_parts, items, human_name)
 
     def _arduino_dist_places(self, dirname_parts):
         """

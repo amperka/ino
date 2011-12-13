@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import os.path
 import subprocess
+import platform
 
 from time import sleep
 from serial import Serial
@@ -36,8 +37,12 @@ class Upload(Command):
 
     def discover(self):
         self.e.find_tool('stty', ['stty'])
-        self.e.find_arduino_tool('avrdude', ['hardware', 'tools'])
-        self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'])
+        if platform.system() == 'Linux':
+            self.e.find_arduino_tool('avrdude', ['hardware', 'tools'])
+            self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'])
+        else:
+            self.e.find_arduino_tool('avrdude', ['hardware', 'tools', 'avr', 'bin'])
+            self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools', 'avr', 'etc'])
     
     def run(self, args):
         self.discover()
@@ -53,20 +58,22 @@ class Upload(Command):
         if not os.path.exists(port):
             raise Abort("%s doesn't exist. Is Arduino connected?" % port)
 
-        ret = subprocess.call([self.e['stty'], '-F', port, 'hupcl'])
+        # send a hangup signal when the last process closes the tty
+        file_switch = '-f' if platform.system() == 'Darwin' else '-F'
+        ret = subprocess.call([self.e['stty'], file_switch, port, 'hupcl'])
         if ret:
             raise Abort("stty failed")
 
-        # pulse on dtr
+        # pulse on DTR
         try:
             s = Serial(port, 115200)
         except SerialException as e:
             raise Abort(str(e))
-
         s.setDTR(False)
         sleep(0.1)
         s.setDTR(True)
 
+        # call avrdude to upload .hex
         subprocess.call([
             self.e['avrdude'],
             '-C', self.e['avrdude.conf'],
