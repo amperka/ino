@@ -43,6 +43,8 @@ class Build(Command):
         super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
+        parser.add_argument('-v', '--verbose', default=False, action='store_true',
+                            help='Verbose make output')
 
     def discover(self):
         self.e.find_arduino_file('version.txt', ['lib'],
@@ -115,7 +117,7 @@ class Build(Command):
             'lib': 'lib%s.a',
         }
 
-    def create_jinja(self):
+    def create_jinja(self, verbose):
         templates_dir = os.path.join(os.path.dirname(__file__), '..', 'make')
         self.jenv = jinja2.Environment(
             loader=jinja2.FileSystemLoader(templates_dir),
@@ -128,6 +130,7 @@ class Build(Command):
 
         # inject globals
         self.jenv.globals['e'] = self.e
+        self.jenv.globals['v'] = '' if verbose else '@'
         self.jenv.globals['SpaceList'] = SpaceList
 
     def render_template(self, source, target, **ctx):
@@ -199,6 +202,6 @@ class Build(Command):
     def run(self, args):
         self.discover()
         self.setup_flags(args.board_model)
-        self.create_jinja()
+        self.create_jinja(verbose=args.verbose)
         self.scan_dependencies()
         self.build()

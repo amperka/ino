@@ -13,7 +13,7 @@
 {{ output_filepath }} : {{ sketch_cpps.paths() + (src_dir|glob('*.c', '*.cpp')).paths() }}
 	@mkdir -p {{ output_filepath|dirname }}
 	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
-	@{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
 
 all: {{ output_filepath }}
 
