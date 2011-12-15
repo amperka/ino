@@ -84,6 +84,9 @@ See MIT-LICENSE.txt in the distribution for details.
 Changelog
 =========
 
+0.3.1
+    * Support for ``ino build --verbose``
+
 0.3.0
     * MacOS support
     * Serial port guess
