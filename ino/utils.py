@@ -33,7 +33,7 @@ class FileMap(dict):
 
 
 def list_subdirs(dirname, recursive=False, exclude=[]):
-    entries = [e for e in os.listdir(dirname) if e not in exclude]
+    entries = [e for e in os.listdir(dirname) if e not in exclude and not e.startswith('.')]
     paths = [os.path.join(dirname, e) for e in entries]
     dirs = filter(os.path.isdir, paths)
     if recursive:
