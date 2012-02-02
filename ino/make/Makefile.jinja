@@ -23,32 +23,18 @@ include {{ target.path|depsname }}
 {% endmacro %}
 
 {#
- #   Macro to build an AVR library
- #       source_dir - dir where *.c and *.cpp are
- #       name       - desired library name without suffix and prefix,
- #                    e.g. Ethernet
- #       add_to     - list where result path should be added
+ #   library sources -> *.a
  #}
-{% macro build_library(source_dir, name, add_to) %}
-{% set libdir = e.build_dir|pjoin(name) %}
-{% set c = source_dir|glob('*.c')|filemap(libdir, e.names.obj) %}
-{% set cpp = (source_dir|glob('*.cpp'))|filemap(libdir, e.names.obj) %}
-{% set libpath = libdir|pjoin(name|libname) %}
+{% set libs = e.used_libs|libmap(e.build_dir) %}
+{% for source_dir, target in libs %}
+{% set c = source_dir|glob('*.c')|filemap(target.dirname, e.names.obj) %}
+{% set cpp = (source_dir|glob('*.cpp'))|filemap(target.dirname, e.names.obj) %}
 {% set libobjs = c.target_paths() + cpp.target_paths() %}
 {{ compile_c(c) }}
 {{ compile_cpp(cpp) }}
-{{ libpath }} : {{ libobjs }}
-	@echo {{ ('Linking ' ~ name|libname) |colorize('green') }}
+{{ target.path }} : {{ libobjs }}
+	@echo {{ ('Linking ' ~ target.filename|basename)|colorize('green') }}
 	{{v}}{{ e.ar }} rcs $@ $^
-{% do add_to.insert(0, libpath) %}
-{% endmacro %}
-
-{#
- #   library sources -> *.a
- #}
-{% set libs = SpaceList() %}
-{% for libdir in e.used_libs %}
-{{ build_library(libdir, libdir|basename, add_to=libs) }}
 {% endfor %}
 
 {#
@@ -66,7 +52,7 @@ include {{ target.path|depsname }}
 {#
  #   *.o -> elf
  #}
-{% set objs = c.target_paths() + cpp.target_paths() + libs %}
+{% set objs = c.target_paths() + cpp.target_paths() + libs.target_paths() %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
 	@echo {{ 'Linking firmware.elf'|colorize('green') }}

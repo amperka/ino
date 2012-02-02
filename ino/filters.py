@@ -84,6 +84,14 @@ def filemap(sources, target_dir, rename_rule):
     return FileMap((source, GlobFile(xname(source, rename_rule), target_dir)) 
                    for source in sources)
 
+@filter
+def libmap(source_dirs, target_dir):
+    return FileMap((
+        source_dir, 
+        GlobFile(libname(basename(source_dir)), 
+                 pjoin(target_dir, basename(source_dir))))
+        for source_dir in source_dirs)
+
 
 @filter
 def colorize(s, color):
