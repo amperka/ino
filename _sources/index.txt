@@ -84,6 +84,19 @@ See MIT-LICENSE.txt in the distribution for details.
 Changelog
 =========
 
+0.3.2
+    * Fix #13: Local header #includes from sketch files are no longer lead to
+      'No such file or directory' error. Now GCC is given an additional include
+      path pointing to the sketch origin while compiling processed source.
+    * Fix #18: Proper scanning of dependency files when multiple library
+      dependencies are found on the same line. Now all of them are taken into
+      account, not just first one.
+    * Add: Processed sketch files now have #line directive so that they appear
+      as original source in GCC in case of syntax errors.
+    * Add: Automatic dependency tracking for included header files. Now a
+      sketch or cpp source get rebuild once an included (directly or
+      indirectly) header changes.
+
 0.3.1
     * Support for ``ino build --verbose``
 

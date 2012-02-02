@@ -152,6 +152,21 @@ See MIT-LICENSE.txt in the distribution for details.</p>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
+<dt>0.3.2</dt>
+<dd><ul class="first last simple">
+<li>Fix #13: Local header #includes from sketch files are no longer lead to
+&#8216;No such file or directory&#8217; error. Now GCC is given an additional include
+path pointing to the sketch origin while compiling processed source.</li>
+<li>Fix #18: Proper scanning of dependency files when multiple library
+dependencies are found on the same line. Now all of them are taken into
+account, not just first one.</li>
+<li>Add: Processed sketch files now have #line directive so that they appear
+as original source in GCC in case of syntax errors.</li>
+<li>Add: Automatic dependency tracking for included header files. Now a
+sketch or cpp source get rebuild once an included (directly or
+indirectly) header changes.</li>
+</ul>
+</dd>
 <dt>0.3.1</dt>
 <dd><ul class="first last simple">
 <li>Support for <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">build</span> <span class="pre">--verbose</span></tt></li>
