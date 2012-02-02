@@ -7,6 +7,7 @@
 {% set cpp = (src_dir|glob('*.c', '*.cpp') + src_build_dir|glob('*.cpp'))|filemap(src_build_dir, e.names.deps) %}
 {% for source, target in cpp %}
 {{ target.path }} : {{ source.path }}
+	@mkdir -p {{ target.path|dirname }}
 	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@;
 {% endfor %}
 
