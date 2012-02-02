@@ -84,6 +84,11 @@ See MIT-LICENSE.txt in the distribution for details.
 Changelog
 =========
 
+0.3.3
+    * Fix #16: ``*.ino`` and ``*.pde`` sketches are now populated with function
+      prototypes while preprocessing step in the same way as it done by Arduino IDE,
+      so it is now possible to use functions before they're declared or defined.
+
 0.3.2
     * Fix #13: Local header #includes from sketch files are no longer lead to
       'No such file or directory' error. Now GCC is given an additional include
