@@ -9,7 +9,8 @@
 {{ target.path }} : {{ source.path }}
 	@echo {{ (source.dirname|basename|pjoin(source.filename))|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
-	{{v}}{{ compiler }} {{ iquote(source) }} -o $@ -c $^
+	{{v}}{{ compiler }} {{ iquote(source) }} -o $@ -c {{ source.path }}
+include {{ target.path|depsname }}
 {% endfor %}
 {% endmacro %}
 
@@ -46,8 +47,7 @@
  #   library sources -> *.a
  #}
 {% set libs = SpaceList() %}
-{{ build_library(e.arduino_core_dir, 'core', add_to=libs) }}
-{% for libdir in e.extra_libs %}
+{% for libdir in e.used_libs %}
 {{ build_library(libdir, libdir|basename, add_to=libs) }}
 {% endfor %}
 

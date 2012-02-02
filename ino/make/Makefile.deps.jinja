@@ -16,7 +16,9 @@
 {% for source, target in cpp %}
 {{ target.path }} : {{ source.path }}
 	@mkdir -p {{ target.path|dirname }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@;
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@
+	{# prepend build path to a target in generated file #}
+	@echo -n "{{ target.path|dirname }}{{ slash }}" | cat - $@ > $@~ && mv $@~ $@
 {% endfor %}
 
 {#

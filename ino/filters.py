@@ -69,6 +69,11 @@ def libname(filepath):
     return xname(filepath, 'lib%s.a')
 
 
+@filter
+def depsname(filepath):
+    return xname(filepath, '%s.d')
+
+
 basename = filter(os.path.basename)
 dirname = filter(os.path.dirname)
 relative_to = filter(os.path.relpath)
