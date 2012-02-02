@@ -1,19 +1,12 @@
 
-{% set src_build_dir = e.build_dir|pjoin(e.src_dir|basename) %}
-
-{% if e.arduino_lib_version.major %}
-    {% set header = 'Arduino.h' %}
-{% else %}
-    {% set header = 'WProgram.h' %}
-{% endif %}
+{% from "Makefile.common.jinja" import src_build_dir with context %}
 
 {% set sketches = e.src_dir|glob('*.pde', '*.ino')|filemap(src_build_dir, e.names.cpp) %}
 {% for source, target in sketches.iterpaths() %}
 {{ target }} : {{ source }}
 	@mkdir -p {{ target|dirname }}
-	@echo '#include <{{ header }}>' > $@
-	@echo '#line 1 "{{ source }}"' >> $@
-	@cat {{ source }} >> $@
+	@echo {{ source|colorize('yellow') }}
+	{{v}}{{ e.ino }} preproc {% if 'arduino_dist_dir' in e %}-d {{ e['arduino_dist_dir'] }}{% endif %} -o $@ $^
 {% endfor %}
 
 all : {{ sketches.target_paths() }}

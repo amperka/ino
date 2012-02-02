@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import sys
 import os.path
 import itertools
 import argparse
@@ -65,6 +66,7 @@ class Environment(dict):
         arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
 
     default_board_model = 'uno'
+    ino = sys.argv[0]
 
     def dump(self):
         if not os.path.isdir(self.build_dir):
