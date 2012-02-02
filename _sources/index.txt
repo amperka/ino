@@ -92,7 +92,7 @@ Changelog
       dependencies are found on the same line. Now all of them are taken into
       account, not just first one.
     * Add: Processed sketch files now have #line directive so that they appear
-      as original source in GCC in case of syntax errors.
+      as original source in GCC output in case of syntax errors.
     * Add: Automatic dependency tracking for included header files. Now a
       sketch or cpp source get rebuild once an included (directly or
       indirectly) header changes.
