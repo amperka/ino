@@ -1,21 +1,44 @@
 
-{% from 'Makefile.common.jinja' import transform_sketches with context %}
+{% set src_build_dir = e.build_dir|pjoin(src_dir|basename) %}
 
 {#
- #   sketches -> *.cpp
+ #   *.ino *.pde -> *.d
  #}
-{% set sketch_cpps = SpaceList() %}
-{{ transform_sketches(src_dir, sketch_cpps) }}
+{% set ino = e.src_dir|glob('*.pde', '*.ino')|filemap(src_build_dir, e.names.deps) %}
+{% for source, target in ino %}
+{% set cpps = ino.sources()|filemap(src_build_dir, e.names.cpp) %}
+{% if e.arduino_lib_version.major %}
+    {% set header = 'Arduino.h' %}
+{% else %}
+    {% set header = 'WProgram.h' %}
+{% endif %}
+{% set cpp = cpps[source] %}
+{{ cpp.path }} : {{ source.path }}
+	@mkdir -p {{ cpp.dirname }}
+	@echo '#include <{{ header }}>' > $@
+	@cat {{ source.path }} >> $@
+{{ target.path }} : {{ cpp.path }}
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -iquote {{source.dirname}} -MM $^ > $@;
+{% endfor %}
 
 {#
- #   *.c *.cpp -> dependencies file
+ #   *.c *.cpp -> *.d
  #}
-{{ output_filepath }} : {{ sketch_cpps.paths() + (src_dir|glob('*.c', '*.cpp')).paths() }}
-	@mkdir -p {{ output_filepath|dirname }}
-	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
+{% set cpp = src_dir|glob('*.c', '*.cpp')|filemap(src_build_dir, e.names.deps) %}
+{% for source, target in cpp %}
+{{ target.path }} : {{ source.path }}
 	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
+{% endfor %}
 
-all: {{ output_filepath }}
+{#
+ #   *.d -> united output
+ #}
+{{ output_filepath }} : {{ ino.target_paths() + cpp.target_paths() }}
+	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
+	@mkdir -p {{ output_filepath|dirname }}
+	{{v}}cat $^ > $@;
+
+all : {{ output_filepath }}
 
 {#
 vim:noexpandtab filetype=jinja

@@ -115,6 +115,8 @@ class Build(Command):
         self.e['names'] = {
             'obj': '%s.o',
             'lib': 'lib%s.a',
+            'cpp': '%s.cpp',
+            'deps': '%s.d',
         }
 
     def create_jinja(self, verbose):

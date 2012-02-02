@@ -22,6 +22,22 @@
 {{ compile(filemap, e.cxx ~ ' ' ~ e.cflags ~ ' ' ~ e.cxxflags) }}
 {% endmacro %}
 
+{% macro compile_ino(filemap) %}
+{% set cpps = filemap.sources()|filemap(src_build_dir, '%s.cpp') %}
+{% for source, target in filemap %}
+{% if e.arduino_lib_version.major %}
+    {% set header = 'Arduino.h' %}
+{% else %}
+    {% set header = 'WProgram.h' %}
+{% endif %}
+{% set cpp = cpps[source] %}
+{{ cpp.path }} : {{ source.path }}
+	@mkdir -p {{ cpp.dirname }}
+	@echo '#include <{{ header }}>' > $@
+	@cat {{ source }} >> $@
+{{ compile([(cpp, target)], e.cxx ~ ' ' ~ e.cflags ~ ' ' ~ e.cxxflags ~ ' -iquote ' ~ source.dirname) }}
+{% endfor %}
+{% endmacro %}
 
 {#
  #   Macro to build an AVR library
@@ -54,10 +70,10 @@
 {% endfor %}
 
 {#
- #   sketches -> *.cpp
+ #   *.ino *.pde -> *.o
  #}
-{% set sketch_cpps = SpaceList() %}
-{{ transform_sketches(e.src_dir, sketch_cpps) }}
+{% set ino = e.src_dir|glob('*.pde', '*.ino')|filemap(src_build_dir, e.names.obj) %}
+{{ compile_ino(ino) }}
 
 {#
  #   *.c -> *.o
@@ -68,13 +84,13 @@
 {#
  #   *.cpp -> *.o
  #}
-{% set cpp = (e.src_dir|glob('*.cpp') + sketch_cpps)|filemap(src_build_dir, e.names.obj) %}
+{% set cpp = e.src_dir|glob('*.cpp')|filemap(src_build_dir, e.names.obj) %}
 {{ compile_cpp(cpp) }}
 
 {#
  #   *.o -> elf
  #}
-{% set objs = c.target_paths() + cpp.target_paths() + libs %}
+{% set objs = c.target_paths() + cpp.target_paths() + ino.target_paths() + libs %}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
 	@echo {{ 'Linking firmware.elf'|colorize('green') }}
