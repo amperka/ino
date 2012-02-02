@@ -1,21 +1,15 @@
 
-{% from 'Makefile.common.jinja' import transform_sketches with context %}
-{% set src_build_dir = e.build_dir|pjoin(e.src_dir|basename) %}
+{% from "Makefile.common.jinja" import iquote, src_build_dir with context %}
 
 {#
  #   Macros to transform *.c and *.cpp -> *.o
  #}
 {% macro compile(filemap, compiler) %}
 {% for source, target in filemap %}
-{% if source.path.startswith(src_build_dir) %}
-    {% set extra_flags = '-iquote ' ~ e.src_dir|pjoin(source.path|relative_to(src_build_dir))|dirname %}
-{% else %}
-    {% set extra_flags = '' %}
-{% endif %}
 {{ target.path }} : {{ source.path }}
 	@echo {{ (source.dirname|basename|pjoin(source.filename))|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
-	{{v}}{{ compiler }} {{ extra_flags }} -o $@ -c $^
+	{{v}}{{ compiler }} {{ iquote(source) }} -o $@ -c $^
 {% endfor %}
 {% endmacro %}
 

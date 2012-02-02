@@ -1,18 +1,13 @@
 
-{% set src_build_dir = e.build_dir|pjoin(src_dir|basename) %}
+{% from "Makefile.common.jinja" import iquote, src_build_dir with context %}
 
 {#
  #   *.c *.cpp -> *.d
  #}
 {% set cpp = (src_dir|glob('*.c', '*.cpp') + src_build_dir|glob('*.cpp'))|filemap(src_build_dir, e.names.deps) %}
 {% for source, target in cpp %}
-{% if source.path.startswith(src_build_dir) %}
-    {% set extra_flags = '-iquote ' ~ src_dir|pjoin(source.path|relative_to(src_build_dir))|dirname %}
-{% else %}
-    {% set extra_flags = '' %}
-{% endif %}
 {{ target.path }} : {{ source.path }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ extra_flags }} -MM $^ > $@;
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@;
 {% endfor %}
 
 {#
