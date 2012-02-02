@@ -47,20 +47,9 @@ class Build(Command):
                             help='Verbose make output')
 
     def discover(self):
-        self.e.find_arduino_file('version.txt', ['lib'],
-                                 human_name='Arduino lib version file (version.txt)')
-
-        if 'arduino_lib_version' not in self.e:
-            with open(self.e['version.txt']) as f:
-                print 'Detecting Arduino software version ... ',
-                v_string = f.read().strip()
-                v = Version.parse(v_string)
-                self.e['arduino_lib_version'] = v
-                print colorize("%s (%s)" % (v, v_string), 'green')
-
         self.e.find_arduino_dir('arduino_core_dir', 
                                 ['hardware', 'arduino', 'cores', 'arduino'], 
-                                ['Arduino.h'] if self.e.arduino_lib_version.major else 'WProgram.h', 
+                                ['Arduino.h'] if self.e.arduino_lib_version.major else ['WProgram.h'], 
                                 'Arduino core library')
 
         self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],
