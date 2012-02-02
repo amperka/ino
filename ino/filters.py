@@ -71,6 +71,7 @@ def libname(filepath):
 
 basename = filter(os.path.basename)
 dirname = filter(os.path.dirname)
+relative_to = filter(os.path.relpath)
 
 
 @filter

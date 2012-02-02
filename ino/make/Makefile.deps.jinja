@@ -2,38 +2,23 @@
 {% set src_build_dir = e.build_dir|pjoin(src_dir|basename) %}
 
 {#
- #   *.ino *.pde -> *.d
- #}
-{% set ino = e.src_dir|glob('*.pde', '*.ino')|filemap(src_build_dir, e.names.deps) %}
-{% for source, target in ino %}
-{% set cpps = ino.sources()|filemap(src_build_dir, e.names.cpp) %}
-{% if e.arduino_lib_version.major %}
-    {% set header = 'Arduino.h' %}
-{% else %}
-    {% set header = 'WProgram.h' %}
-{% endif %}
-{% set cpp = cpps[source] %}
-{{ cpp.path }} : {{ source.path }}
-	@mkdir -p {{ cpp.dirname }}
-	@echo '#include <{{ header }}>' > $@
-	@cat {{ source.path }} >> $@
-{{ target.path }} : {{ cpp.path }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -iquote {{source.dirname}} -MM $^ > $@;
-{% endfor %}
-
-{#
  #   *.c *.cpp -> *.d
  #}
-{% set cpp = src_dir|glob('*.c', '*.cpp')|filemap(src_build_dir, e.names.deps) %}
+{% set cpp = (src_dir|glob('*.c', '*.cpp') + src_build_dir|glob('*.cpp'))|filemap(src_build_dir, e.names.deps) %}
 {% for source, target in cpp %}
+{% if source.path.startswith(src_build_dir) %}
+    {% set extra_flags = '-iquote ' ~ src_dir|pjoin(source.path|relative_to(src_build_dir))|dirname %}
+{% else %}
+    {% set extra_flags = '' %}
+{% endif %}
 {{ target.path }} : {{ source.path }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} -MM $^ > $@;
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ extra_flags }} -MM $^ > $@;
 {% endfor %}
 
 {#
  #   *.d -> united output
  #}
-{{ output_filepath }} : {{ ino.target_paths() + cpp.target_paths() }}
+{{ output_filepath }} : {{ cpp.target_paths() }}
 	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
 	@mkdir -p {{ output_filepath|dirname }}
 	{{v}}cat $^ > $@;

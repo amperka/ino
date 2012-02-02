@@ -144,6 +144,12 @@ class Build(Command):
 
         return out_path
 
+    def make(self, makefile, **kwargs):
+        makefile = self.render_template(makefile + '.jinja', makefile, **kwargs)
+        ret = subprocess.call(['make', '-f', makefile, 'all'])
+        if ret != 0:
+            raise Abort("Make failed with code %s" % ret)
+
     def recursive_inc_lib_flags(self, libdirs):
         flags = SpaceList()
         for d in libdirs:
@@ -153,11 +159,7 @@ class Build(Command):
 
     def _scan_dependencies(self, dir, lib_dirs, inc_flags):
         output_filepath = os.path.join(self.e.build_dir, os.path.basename(dir), 'dependencies.d')
-        makefile = self.render_template('Makefile.deps.jinja', 'Makefile.deps',
-                                        inc_flags=inc_flags, src_dir=dir,
-                                        output_filepath=output_filepath)
-
-        subprocess.call(['make', '-f', makefile, 'all'])
+        self.make('Makefile.deps', inc_flags=inc_flags, src_dir=dir, output_filepath=output_filepath)
         self.e['deps'].append(output_filepath)
 
         # search for dependencies on libraries
@@ -197,13 +199,10 @@ class Build(Command):
         self.e['extra_libs'] = list(used_libs)
         self.e['cflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
-    def build(self):
-        makefile = self.render_template('Makefile.jinja', 'Makefile')
-        subprocess.call(['make', '-f', makefile, 'all'])
-
     def run(self, args):
         self.discover()
         self.setup_flags(args.board_model)
         self.create_jinja(verbose=args.verbose)
+        self.make('Makefile.sketch')
         self.scan_dependencies()
-        self.build()
+        self.make('Makefile')

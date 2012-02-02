@@ -1,0 +1,23 @@
+
+{% set src_build_dir = e.build_dir|pjoin(e.src_dir|basename) %}
+
+{% if e.arduino_lib_version.major %}
+    {% set header = 'Arduino.h' %}
+{% else %}
+    {% set header = 'WProgram.h' %}
+{% endif %}
+
+{% set sketches = e.src_dir|glob('*.pde', '*.ino')|filemap(src_build_dir, e.names.cpp) %}
+{% for source, target in sketches.iterpaths() %}
+{{ target }} : {{ source }}
+	@mkdir -p {{ target|dirname }}
+	@echo '#include <{{ header }}>' > $@
+	@echo '#line 1 "{{ source }}"' >> $@
+	@cat {{ source }} >> $@
+{% endfor %}
+
+all : {{ sketches.target_paths() }}
+
+{#
+vim:noexpandtab filetype=jinja
+#}
