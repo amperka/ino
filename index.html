@@ -152,6 +152,13 @@ See MIT-LICENSE.txt in the distribution for details.</p>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
+<dt>0.3.3</dt>
+<dd><ul class="first last simple">
+<li>Fix #16: <tt class="docutils literal"><span class="pre">*.ino</span></tt> and <tt class="docutils literal"><span class="pre">*.pde</span></tt> sketches are now populated with function
+prototypes while preprocessing step in the same way as it done by Arduino IDE,
+so it is now possible to use functions before they&#8217;re declared or defined.</li>
+</ul>
+</dd>
 <dt>0.3.2</dt>
 <dd><ul class="first last simple">
 <li>Fix #13: Local header #includes from sketch files are no longer lead to
