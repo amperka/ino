@@ -36,6 +36,9 @@ def glob(dir, *patterns, **kwargs):
 
     result = SpaceList()
     scan_dir = os.path.join(dir, subdir)
+    if not os.path.isdir(scan_dir):
+        return result
+
     for entry in os.listdir(scan_dir):
         path = os.path.join(scan_dir, entry)
         if os.path.isdir(path) and recursive:
