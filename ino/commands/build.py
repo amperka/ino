@@ -161,7 +161,7 @@ class Build(Command):
         with open(output_filepath) as f:
             for line in f:
                 for lib, regex in regexes.iteritems():
-                    if regex.search(line):
+                    if regex.search(line) and lib != dir:
                         used_libs.add(lib)
 
         return used_libs
@@ -172,14 +172,34 @@ class Build(Command):
         lib_dirs = [self.e.arduino_core_dir] + list_subdirs(self.e.lib_dir) + list_subdirs(self.e.arduino_libraries_dir)
         inc_flags = self.recursive_inc_lib_flags(lib_dirs)
 
-        used_libs = self._scan_dependencies(self.e.src_dir, lib_dirs, inc_flags)
-        scanned_libs = set()
-        while scanned_libs != used_libs:
-            for lib_dir in list(used_libs - scanned_libs):
-                used_libs |= self._scan_dependencies(lib_dir, lib_dirs, inc_flags)
-                scanned_libs.add(lib_dir)
+        # If lib A depends on lib B it have to appear before B in final
+        # list so that linker could link all together correctly
+        # but order of `_scan_dependencies` is not defined, so...
+        
+        # 1. Get dependencies of sources in arbitrary order
+        used_libs = list(self._scan_dependencies(self.e.src_dir, lib_dirs, inc_flags))
 
-        self.e['used_libs'] = list(used_libs)
+        # 2. Get dependencies of dependency libs themselves: existing dependencies
+        # are moved to the end of list maintaining order, new dependencies are appended
+        scanned_libs = set()
+        while scanned_libs != set(used_libs):
+            for lib in set(used_libs) - scanned_libs:
+                dep_libs = self._scan_dependencies(lib, lib_dirs, inc_flags)
+
+                i = 0
+                for ulib in used_libs[:]:
+                    if ulib in dep_libs:
+                        # dependency lib used already, move it to the tail
+                        used_libs.append(used_libs.pop(i))
+                        dep_libs.remove(ulib)
+                    else:
+                        i += 1
+
+                # append new dependencies to the tail
+                used_libs.extend(dep_libs)
+                scanned_libs.add(lib)
+
+        self.e['used_libs'] = used_libs
         self.e['cflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
     def run(self, args):

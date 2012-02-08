@@ -5,7 +5,7 @@
  #   Macros to transform *.c and *.cpp -> *.o
  #}
 {% macro compile(filemap, compiler) %}
-{% for source, target in filemap %}
+{% for source, target in filemap.items() %}
 {{ target.path }} : {{ source.path }}
 	@echo {{ (source.dirname|basename|pjoin(source.filename))|colorize('yellow') }}
 	@mkdir -p {{ target.path|dirname }}
@@ -26,7 +26,7 @@ include {{ target.path|depsname }}
  #   library sources -> *.a
  #}
 {% set libs = e.used_libs|libmap(e.build_dir) %}
-{% for source_dir, target in libs %}
+{% for source_dir, target in libs.items() %}
 {% set c = source_dir|glob('*.c')|filemap(target.dirname, e.names.obj) %}
 {% set cpp = (source_dir|glob('*.cpp'))|filemap(target.dirname, e.names.obj) %}
 {% set libobjs = c.target_paths() + cpp.target_paths() %}

@@ -13,7 +13,7 @@
 	{% set cpp = src_dir|glob('*.c', '*.cpp')|filemap(src_build_dir, e.names.deps) %}
 {% endif %}
 
-{% for source, target in cpp %}
+{% for source, target in cpp.items() %}
 {{ target.path }} : {{ source.path }}
 	@mkdir -p {{ target.path|dirname }}
 	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@
