@@ -72,6 +72,44 @@ class Upload(Command):
         s.setDTR(False)
         sleep(0.1)
         s.setDTR(True)
+        s.close()
+
+        # need to do a little dance for Leonardo and derivatives:
+        # open then close the port at the magic baudrate (usually 1200 bps) first
+        # to signal to the sketch that it should reset into bootloader. after doing
+        # this wait a moment for the bootloader to enumerate. On Windows, also must
+        # deal with the fact that the COM port number changes from bootloader to
+        # sketch.
+        if board['bootloader']['path'] == "caterina":
+            caterinaUploadPort = None
+            before = self.e.list_serial_ports()
+            if port in before:
+              ser = Serial()
+              ser.port=port
+              ser.baudrate=1200
+              ser.open(); 
+              ser.close()
+
+              # Scanning for available ports seems to open the port or
+              # otherwise assert DTR, which would cancel the WDT reset if
+              # it happened within 250 ms.  So we wait until the reset should
+              # have already occured before we start scanning.
+              if platform.system() != 'Darwin': sleep(0.3)
+            elapsed = 0
+            while elapsed < 10000:
+              now = self.e.list_serial_ports()
+              diff = list(set(now) - set(before))
+              if len(diff) > 0:
+                caterinaUploadPort = diff[0]
+                break
+              before = now
+              sleep(0.250)
+              elapsed += 250
+
+            if caterinaUploadPort == None:
+              raise Abort("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload.")
+            else:
+              port = caterinaUploadPort
 
         # call avrdude to upload .hex
         subprocess.call([
