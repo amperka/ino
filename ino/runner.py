@@ -58,7 +58,7 @@ def main():
         e.process_args(args)
 
         if current_command not in 'clean init' and not os.path.isdir(e.build_dir):
-            os.mkdir(e.build_dir)
+            os.makedirs(e.build_dir)
 
         args.func(args)
     except Abort as exc:

@@ -133,7 +133,7 @@ class Build(Command):
     def render_template(self, source, target, **ctx):
         template = self.jenv.get_template(source)
         contents = template.render(**ctx)
-        out_path = os.path.join(self.e['build_dir'], target)
+        out_path = os.path.join(self.e.build_dir, target)
         with open(out_path, 'wt') as f:
             f.write(contents)
 

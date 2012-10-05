@@ -6,6 +6,7 @@ import itertools
 import argparse
 import pickle
 import platform
+import hashlib
 import re
 
 try:
@@ -52,7 +53,7 @@ class Version(namedtuple('Version', 'major minor')):
 class Environment(dict):
 
     templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
-    build_dir = '.build'
+    output_dir = '.build'
     src_dir = 'src'
     lib_dir = 'lib'
     hex_filename = 'firmware.hex'
@@ -70,7 +71,7 @@ class Environment(dict):
     ino = sys.argv[0]
 
     def dump(self):
-        if not os.path.isdir(self.build_dir):
+        if not os.path.isdir(self.output_dir):
             return
         with open(self.dump_filepath, 'wb') as f:
             pickle.dump(self.items(), f)
@@ -87,7 +88,7 @@ class Environment(dict):
 
     @property
     def dump_filepath(self):
-        return os.path.join(self.build_dir, 'environment.pickle')
+        return os.path.join(self.output_dir, 'environment.pickle')
 
     def __getitem__(self, key):
         try:
@@ -248,6 +249,15 @@ class Environment(dict):
                 print "Supported Arduino board models are:"
                 print all_models.format()
                 raise Abort('%s is not a valid board model' % board_model)
+
+        # Build artifacts for each Arduino distribution / Board model
+        # pair should go to a separate subdirectory
+        build_dirname = board_model or self.default_board_model
+        if arduino_dist:
+            hash = hashlib.md5(arduino_dist).hexdigest()[:8]
+            build_dirname = '%s-%s' % (build_dirname, hash)
+
+        self['build_dir'] = os.path.join(self.output_dir, build_dirname)
 
     @property
     def arduino_lib_version(self):

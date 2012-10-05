@@ -17,5 +17,5 @@ class Clean(Command):
     help_line = "Remove intermediate compilation files completely"
 
     def run(self, args):
-        if os.path.isdir(self.e.build_dir):
-            shutil.rmtree(self.e.build_dir)
+        if os.path.isdir(self.e.output_dir):
+            shutil.rmtree(self.e.output_dir)
