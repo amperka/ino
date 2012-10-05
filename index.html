@@ -54,6 +54,7 @@
 <li><a class="reference internal" href="#limitations">Limitations</a></li>
 <li><a class="reference internal" href="#getting-help">Getting Help</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#contributors">Contributors</a></li>
 <li><a class="reference internal" href="#changelog">Changelog</a></li>
 </ul>
 </li>
@@ -149,9 +150,27 @@ Help from Windows-developers is much appreciated.</li>
 <p>If not stated otherwise ino is distributed in terms of MIT software license.
 See MIT-LICENSE.txt in the distribution for details.</p>
 </div>
+<div class="section" id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/dcharbonnier">David Charbonnier</a>.</li>
+<li><a class="reference external" href="https://github.com/jboone">Jared Boone</a>.</li>
+</ul>
+</div>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
+<dt>0.3.4</dt>
+<dd><ul class="first last simple">
+<li>Fix #44, #45: Building and uploading for Arduino Leonardo is fully supported.</li>
+<li>Fix #3, #29: Build artifacts for different board models and Arduino distributions
+go in different build subdirectories, so you haven&#8217;t to run <tt class="docutils literal"><span class="pre">ino</span> <span class="pre">clean</span></tt> and
+rebuild if you switch to another Arduino model or software distribution.</li>
+<li>The version of avr gcc toolset that is bundled with Arduino Software is now
+always preferred over system-wide. So that users with edge-versions of software
+(such as Arch Linux) able to produce expected results.</li>
+</ul>
+</dd>
 <dt>0.3.3</dt>
 <dd><ul class="first last simple">
 <li>Fix #16: <tt class="docutils literal"><span class="pre">*.ino</span></tt> and <tt class="docutils literal"><span class="pre">*.pde</span></tt> sketches are now populated with function
@@ -209,7 +228,7 @@ indirectly) header changes.</li>
     
     <div class="footer">
         &copy; Copyright 2011, Amperka Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
     <!-- Yandex.Metrika counter -->
     <div style="display:none;"><script type="text/javascript">

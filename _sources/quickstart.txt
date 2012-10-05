@@ -22,9 +22,9 @@ Lets see what we've got::
     .
     ├── lib
     └── src
-        └── sketch.pde
+        └── sketch.ino
 
-    $ cat src/sketch.pde
+    $ cat src/sketch.ino
 
     #define LED_PIN 13
 
@@ -42,7 +42,7 @@ Lets see what we've got::
     }
 
 Here we have two directories. ``src`` is a source directory where we can
-put our project's ``*.[c|cpp|pde|h|hpp]`` source files. ``sketch.pde``
+put our project's ``*.[c|cpp|pde|h|hpp]`` source files. ``sketch.ino``
 was created for us, so we have a starting point. ``lib`` is a directory
 where we may put 3-rd party libraries if we would want.
 
@@ -127,7 +127,7 @@ Serial communication
 --------------------
 
 OK, now lets deal with serial communication a bit. With editor of your choice change
-``src/sketch.pde`` to::
+``src/sketch.ino`` to::
 
     void setup()
     {

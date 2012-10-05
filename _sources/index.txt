@@ -81,8 +81,23 @@ License
 If not stated otherwise ino is distributed in terms of MIT software license.
 See MIT-LICENSE.txt in the distribution for details.
 
+Contributors
+============
+
+* `David Charbonnier <https://github.com/dcharbonnier>`_.
+* `Jared Boone <https://github.com/jboone>`_.
+
 Changelog
 =========
+
+0.3.4
+    * Fix #44, #45: Building and uploading for Arduino Leonardo is fully supported.
+    * Fix #3, #29: Build artifacts for different board models and Arduino distributions
+      go in different build subdirectories, so you haven't to run ``ino clean`` and
+      rebuild if you switch to another Arduino model or software distribution.
+    * The version of avr gcc toolset that is bundled with Arduino Software is now
+      always preferred over system-wide. So that users with edge-versions of software
+      (such as Arch Linux) able to produce expected results.
 
 0.3.3
     * Fix #16: ``*.ino`` and ``*.pde`` sketches are now populated with function
