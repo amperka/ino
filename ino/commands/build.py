@@ -67,16 +67,10 @@ class Build(Command):
             ('objcopy', 'avr-objcopy'),
         ]
 
-        # Linux has system-wide avr gcc toolset
-        # other platforms are bundled with it as a part of Arduino Software
-        system_wide = platform.system() == 'Linux'
-
         for tool_key, tool_binary in toolset:
-            if system_wide:
-                self.e.find_tool(tool_key, [tool_binary], human_name=tool_binary)
-            else:
-                self.e.find_arduino_tool(tool_key, ['hardware', 'tools', 'avr', 'bin'], 
-                                         items=[tool_binary], human_name=tool_binary)
+            self.e.find_arduino_tool(
+                tool_key, ['hardware', 'tools', 'avr', 'bin'], 
+                items=[tool_binary], human_name=tool_binary)
 
     def setup_flags(self, board_key):
         board = self.e.board_model(board_key)

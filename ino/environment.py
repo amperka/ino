@@ -148,8 +148,10 @@ class Environment(dict):
     def find_arduino_file(self, key, dirname_parts, items=None, human_name=None):
         return self.find_file(key, items, self._arduino_dist_places(dirname_parts), human_name)
 
-    def find_arduino_tool(self, key, filename_parts, items=None, human_name=None):
-        return self.find_arduino_file(key, filename_parts, items, human_name)
+    def find_arduino_tool(self, key, dirname_parts, items=None, human_name=None):
+        # if not bundled with Arduino Software the tool should be searched on PATH
+        places = self._arduino_dist_places(dirname_parts) + ['$PATH']
+        return self.find_file(key, items, places, human_name)
 
     def _arduino_dist_places(self, dirname_parts):
         """
