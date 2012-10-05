@@ -15,6 +15,7 @@ except ImportError:
     from ordereddict import OrderedDict
 
 from collections import namedtuple
+from glob import glob
 
 from ino.filters import colorize
 from ino.utils import format_available_options
@@ -207,35 +208,33 @@ class Environment(dict):
         parser.add_argument('-d', '--arduino-dist', metavar='PATH', 
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
 
-    def list_serial_ports(self):
-        from glob import glob
-
-        ports = []
+    def serial_port_patterns(self):
         system = platform.system()
-
         if system == 'Linux':
-            patterns = ['/dev/ttyACM*', '/dev/ttyUSB*']
-        elif system == 'Darwin':
-            patterns = ['/dev/tty.usbmodem*', '/dev/tty.usbserial*']
+            return ['/dev/ttyACM*', '/dev/ttyUSB*']
+        if system == 'Darwin':
+            return ['/dev/tty.usbmodem*', '/dev/tty.usbserial*']
+        raise NotImplementedError("Not implemented for Windows")
 
-        for p in patterns:
+    def list_serial_ports(self):
+        ports = []
+        for p in self.serial_port_patterns():
             matches = glob(p)
             ports.extend(matches)
-        
         return ports
 
     def guess_serial_port(self):
-        
         print 'Guessing serial port ...',
 
         ports = self.list_serial_ports()
-        if len(ports)>0:
+        if ports:
             result = ports[0]
             print colorize(result, 'yellow')
             return result
 
         print colorize('FAILED', 'red')
-        raise Abort("No device matching was found")
+        raise Abort("No device matching following was found: %s" %
+                    (''.join(['\n  - ' + p for p in self.serial_port_patterns()])))
 
     def process_args(self, args):
         arduino_dist = getattr(args, 'arduino_dist', None)
