@@ -1,4 +1,5 @@
 include README.rst
 include requirements.txt
+include MIT-LICENSE.txt
 graft ino/make
 graft ino/templates

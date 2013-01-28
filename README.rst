@@ -90,6 +90,9 @@ Contributors
 Changelog
 =========
 
+0.3.5
+    * Fix #62: Include `MIT-LICENSE.txt` in the tarball.
+
 0.3.4
     * Fix #44, #45: Building and uploading for Arduino Leonardo is fully supported.
     * Fix #3, #29: Build artifacts for different board models and Arduino distributions
