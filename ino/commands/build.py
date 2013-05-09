@@ -31,7 +31,7 @@ class Build(Command):
     Also any external library dependencies are tracked automatically. If a
     source file includes any library found among standard Arduino libraries or
     a library placed in `lib' subdirectory of the project, the library gets
-    build too.
+    built too.
 
     Build artifacts are placed in `.build' subdirectory of the project.
     """
