@@ -27,7 +27,7 @@ class Init(Command):
         parser.add_argument('-t', '--template', default=self.default_template, 
                             help='Project template to use')
 
-        parser.epilog = "Available probject templates:\n\n"
+        parser.epilog = "Available project templates:\n\n"
 
         template_items = []
         for tdir in list_subdirs(self.e.templates_dir):
