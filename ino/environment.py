@@ -67,6 +67,11 @@ class Environment(dict):
     if platform.system() == 'Darwin':
         arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
 
+    default_cc = 'avr-gcc'
+    default_cxx = 'avr-g++'
+    default_ar = 'avr-ar'
+    default_objcopy = 'avr-objcopy'
+
     default_cppflags = '-ffunction-sections -fdata-sections -g -Os -w'
     default_cflags = ''
     default_cxxflags = '-fno-exceptions'
@@ -216,6 +221,45 @@ class Environment(dict):
         parser.add_argument('-d', '--arduino-dist', metavar='PATH', 
                             help='Path to Arduino distribution, e.g. ~/Downloads/arduino-0022.\nTry to guess if not specified')
 
+    def add_cc_arg(self, parser):
+        help = '\n'.join([
+            'Specifies the compiler used for C files.',
+            'If a full path is not given, searches in',
+            'Arduino directories before PATH. Default:',
+            '%(default)s.'
+        ])
+        parser.add_argument('-c', '--cc', metavar='COMPILER',
+                            default=self.default_cc, help=help)
+
+    def add_cxx_arg(self, parser):
+        help = '\n'.join([
+            'Specifies the compiler used for C++ files.',
+            'If a full path is not given, searches in',
+            'Arduino directories before PATH. Default:',
+            '%(default)s.'
+        ])
+        parser.add_argument('-+', '--cxx', metavar='COMPILER',
+                            default=self.default_cxx, help=help)
+
+    def add_ar_arg(self, parser):
+        help = '\n'.join([
+            'Specifies the AR tool to use. If a full',
+            'path is not given, searches in Arduino',
+            'directories before PATH. Default: %(default)s.'
+        ])
+        parser.add_argument('-a', '--ar', metavar='AR',
+                            default=self.default_ar, help=help)
+
+    def add_objcopy_arg(self, parser):
+        help = '\n'.join([
+            'Specifies the OBJCOPY to use. If a full',
+            'path is not given, searches in Arduino',
+            'directories before PATH. Default: %(default)s.'
+        ])
+        parser.add_argument('-o', '--objcopy', metavar='OBJCOPY',
+                            default=self.default_objcopy, help=help)
+
+
     def add_cppflags_arg(self, parser):
         help = '\n'.join([
             'Flags that will be passed to the compiler.',
@@ -234,7 +278,7 @@ class Environment(dict):
             'are only passed to compilations of C source',
             'files. Default: %(default)s',
         ])
-        parser.add_argument('-c', '--cflags', metavar='FLAGS',
+        parser.add_argument('-f', '--cflags', metavar='FLAGS',
                             default=self.default_cflags, help=help)
 
     def add_cxxflags_arg(self, parser):

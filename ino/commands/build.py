@@ -44,6 +44,10 @@ class Build(Command):
         super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
+        self.e.add_cc_arg(parser)
+        self.e.add_cxx_arg(parser)
+        self.e.add_ar_arg(parser)
+        self.e.add_objcopy_arg(parser)
         self.e.add_cppflags_arg(parser)
         self.e.add_cflags_arg(parser)
         self.e.add_cxxflags_arg(parser)
@@ -51,7 +55,7 @@ class Build(Command):
         parser.add_argument('-v', '--verbose', default=False, action='store_true',
                             help='Verbose make output')
 
-    def discover(self):
+    def discover(self, args):
         self.e.find_arduino_dir('arduino_core_dir', 
                                 ['hardware', 'arduino', 'cores', 'arduino'], 
                                 ['Arduino.h'] if self.e.arduino_lib_version.major else ['WProgram.h'], 
@@ -66,10 +70,10 @@ class Build(Command):
                                     human_name='Arduino variants directory')
 
         toolset = [
-            ('cc', 'avr-gcc'),
-            ('cxx', 'avr-g++'),
-            ('ar', 'avr-ar'),
-            ('objcopy', 'avr-objcopy'),
+            ('cc', args.cc),
+            ('cxx', args.cxx),
+            ('ar', args.ar),
+            ('objcopy', args.objcopy),
         ]
 
         for tool_key, tool_binary in toolset:
@@ -211,7 +215,7 @@ class Build(Command):
         self.e['cppflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
     def run(self, args):
-        self.discover()
+        self.discover(args)
         self.setup_flags(args)
         self.create_jinja(verbose=args.verbose)
         self.make('Makefile.sketch')
