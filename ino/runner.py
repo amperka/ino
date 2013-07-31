@@ -59,13 +59,20 @@ def main():
 
         # Create a .build directory if required
         valid_project = os.path.isdir(e.src_dir)
-        do_anywhere = "init clean list-models serial"
+        run_anywhere = "init clean list-models serial"
 
-        if current_command not in do_anywhere:
+        if current_command not in run_anywhere:
             if not valid_project:
                 raise Abort("No project found in this directory.")
-            elif not os.path.isdir(e.build_dir):                
+            
+            # For valid projects create .build & lib
+            if not os.path.isdir(e.build_dir):                
                 os.makedirs(e.build_dir)
+
+            if not os.path.isdir(e.lib_dir):
+                    os.makedirs(e.lib_dir)
+                    with open('lib/.holder', 'w') as f:
+                        f.write("")
 
         args.func(args)
     except Abort as exc:
