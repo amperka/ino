@@ -40,18 +40,70 @@ class Build(Command):
     name = 'build'
     help_line = "Build firmware from the current directory project"
 
+    default_cc = 'avr-gcc'
+    default_cxx = 'avr-g++'
+    default_ar = 'avr-ar'
+    default_objcopy = 'avr-objcopy'
+
+    default_cppflags = '-ffunction-sections -fdata-sections -g -Os -w'
+    default_cflags = ''
+    default_cxxflags = '-fno-exceptions'
+    default_ldflags = '-Os --gc-sections'
+
     def setup_arg_parser(self, parser):
         super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
-        self.e.add_cc_arg(parser)
-        self.e.add_cxx_arg(parser)
-        self.e.add_ar_arg(parser)
-        self.e.add_objcopy_arg(parser)
-        self.e.add_cppflags_arg(parser)
-        self.e.add_cflags_arg(parser)
-        self.e.add_cxxflags_arg(parser)
-        self.e.add_ldflags_arg(parser)
+
+        parser.add_argument('-c', '--cc', metavar='COMPILER',
+                            default=self.default_cc,
+                            help='Specifies the compiler used for C files. If '
+                            'a full path is not given, searches in Arduino '
+                            'directories _before_ PATH. Default: %(default)s.')
+        parser.add_argument('-+', '--cxx', metavar='COMPILER',
+                            default=self.default_cxx,
+                            help='Specifies the compiler used for C++ files. '
+                            'If a full path is not given, searches in Arduino '
+                            'directories _before_ PATH. Default: %(default)s.')
+        parser.add_argument('-a', '--ar', metavar='AR',
+                            default=self.default_ar,
+                            help='Specifies the AR tool to use. If a full path '
+                            'is not given, searches in Arduino directories '
+                            'before PATH. Default: %(default)s.')
+        parser.add_argument('-o', '--objcopy', metavar='OBJCOPY',
+                            default=self.default_objcopy,
+                            help='Specifies the OBJCOPY to use. If a full path '
+                            'is not given, searches in Arduino directories '
+                            'before PATH. Default: %(default)s.')
+
+        parser.add_argument('-p', '--cppflags', metavar='FLAGS',
+                            default=self.default_cppflags,
+                            help='Flags that will be passed to the compiler. '
+                            'Note that multiple (space-separated) flags must '
+                            'be surrounded by quotes, e.g. '
+                            '`--cflags="-DC1 -DC2"\' specifies flags to define '
+                            'the constants C1 and C2. Default: %(default)s')
+
+        parser.add_argument('-f', '--cflags', metavar='FLAGS',
+                            default=self.default_cflags,
+                            help='Like --cppflags, but the flags specified are '
+                            'only passed to compilations of C source files. '
+                            'Default: %(default)s')
+
+        parser.add_argument('-x', '--cxxflags', metavar='FLAGS',
+                            default=self.default_cxxflags,
+                            help='Like --cppflags, but the flags specified '
+                            'are only passed to compilations of C++ source '
+                            'files. Default: %(default)s')
+
+        parser.add_argument('-l', '--ldflags', metavar='FLAGS',
+                            default=self.default_ldflags,
+                            help='Like --cppflags, but the flags specified '
+                            'are only passed during the linking stage. Note '
+                            'these flags should be specified as if `ld\' were '
+                            'being invoked directly (i.e. the `-Wl,\' prefix '
+                            'should be omitted). Default: %(default)s')
+
         parser.add_argument('-v', '--verbose', default=False, action='store_true',
                             help='Verbose make output')
 
