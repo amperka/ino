@@ -34,18 +34,45 @@ class Preprocess(Command):
             out = open(args.output, 'wt')
 
         sketch = open(args.sketch, 'rt').read()
+        prototypes = self.prototypes(sketch)
+        lines = sketch.split('\n')
+        includes, lines = self.extract_includes(lines)
 
         header = 'Arduino.h' if self.e.arduino_lib_version.major else 'WProgram.h'
         out.write('#include <%s>\n' % header)
-        out.write('\n'.join(self.prototypes(sketch)))
-        out.write('\n#line 1 "%s"\n' % args.sketch)
-        out.write(sketch)
+
+        out.write('\n'.join(includes))
+        out.write('\n')
+
+        out.write('\n'.join(prototypes))
+        out.write('\n')
+
+        out.write('#line 1 "%s"\n' % args.sketch)
+        out.write('\n'.join(lines))
 
     def prototypes(self, src):
         src = self.collapse_braces(self.strip(src))
         regex = re.compile("[\\w\\[\\]\\*]+\\s+[&\\[\\]\\*\\w\\s]+\\([&,\\[\\]\\*\\w\\s]*\\)(?=\\s*\\{)")
         matches = regex.findall(src)
         return [m + ';' for m in matches]
+
+    def extract_includes(self, src_lines):
+        regex = re.compile("^\\s*#include\\s*[<\"](\\S+)[\">]")
+        includes = []
+        sketch = []
+        for line in src_lines:
+            match = regex.match(line)
+            if match:
+                includes.append(line)
+                # if the line is #include directive it should be
+                # commented out in original sketch so that
+                #  1) it would not be included twice
+                #  2) line numbers will be preserved
+                sketch.append('//' + line)
+            else:
+                sketch.append(line)
+
+        return includes, sketch
 
     def collapse_braces(self, src):
         """
