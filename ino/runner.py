@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8; -*-
 
 """\
@@ -57,8 +57,22 @@ def main():
     try:
         e.process_args(args)
 
-        if current_command not in 'clean init' and not os.path.isdir(e.build_dir):
-            os.makedirs(e.build_dir)
+        # Create a .build directory if required
+        valid_project = os.path.isdir(e.src_dir)
+        run_anywhere = "init clean list-models serial"
+
+        if current_command not in run_anywhere:
+            if not valid_project:
+                raise Abort("No project found in this directory.")
+            
+            # For valid projects create .build & lib
+            if not os.path.isdir(e.build_dir):                
+                os.makedirs(e.build_dir)
+
+            if not os.path.isdir(e.lib_dir):
+                    os.makedirs(e.lib_dir)
+                    with open('lib/.holder', 'w') as f:
+                        f.write("")
 
         args.func(args)
     except Abort as exc:

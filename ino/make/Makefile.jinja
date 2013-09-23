@@ -15,11 +15,11 @@ include {{ target.path|depsname }}
 {% endmacro %}
 
 {% macro compile_c(filemap) %}
-{{ compile(filemap, e.cc ~ ' ' ~ e.cflags) }}
+{{ compile(filemap, e.cc ~ ' ' ~ e.cppflags ~ ' ' ~ e.cflags) }}
 {% endmacro %}
 
 {% macro compile_cpp(filemap) %}
-{{ compile(filemap, e.cxx ~ ' ' ~ e.cflags ~ ' ' ~ e.cxxflags) }}
+{{ compile(filemap, e.cxx ~ ' ' ~ e.cppflags ~ ' ' ~ e.cxxflags) }}
 {% endmacro %}
 
 {#
@@ -56,7 +56,7 @@ include {{ target.path|depsname }}
 {% set elf = e.build_dir|pjoin('firmware.elf') %}
 {{ elf }} : {{ objs }}
 	@echo {{ 'Linking firmware.elf'|colorize('green') }}
-	{{v}}{{ e.cc }} {{ e.elfflags }} -o $@ $^ -lm
+	{{v}}{{ e.cc }} {{ e.ldflags }} -o $@ $^ -lm
 
 {#
  #   elf -> hex

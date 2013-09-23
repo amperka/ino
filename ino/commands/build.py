@@ -6,6 +6,7 @@ import inspect
 import subprocess
 import platform
 import jinja2
+import shlex
 
 from jinja2.runtime import StrictUndefined
 
@@ -39,14 +40,74 @@ class Build(Command):
     name = 'build'
     help_line = "Build firmware from the current directory project"
 
+    default_cc = 'avr-gcc'
+    default_cxx = 'avr-g++'
+    default_ar = 'avr-ar'
+    default_objcopy = 'avr-objcopy'
+
+    default_cppflags = '-ffunction-sections -fdata-sections -g -Os -w'
+    default_cflags = ''
+    default_cxxflags = '-fno-exceptions'
+    default_ldflags = '-Os --gc-sections'
+
     def setup_arg_parser(self, parser):
         super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
+
+        parser.add_argument('-c', '--cc', metavar='COMPILER',
+                            default=self.default_cc,
+                            help='Specifies the compiler used for C files. If '
+                            'a full path is not given, searches in Arduino '
+                            'directories _before_ PATH. Default: %(default)s.')
+        parser.add_argument('-+', '--cxx', metavar='COMPILER',
+                            default=self.default_cxx,
+                            help='Specifies the compiler used for C++ files. '
+                            'If a full path is not given, searches in Arduino '
+                            'directories _before_ PATH. Default: %(default)s.')
+        parser.add_argument('-a', '--ar', metavar='AR',
+                            default=self.default_ar,
+                            help='Specifies the AR tool to use. If a full path '
+                            'is not given, searches in Arduino directories '
+                            'before PATH. Default: %(default)s.')
+        parser.add_argument('-o', '--objcopy', metavar='OBJCOPY',
+                            default=self.default_objcopy,
+                            help='Specifies the OBJCOPY to use. If a full path '
+                            'is not given, searches in Arduino directories '
+                            'before PATH. Default: %(default)s.')
+
+        parser.add_argument('-p', '--cppflags', metavar='FLAGS',
+                            default=self.default_cppflags,
+                            help='Flags that will be passed to the compiler. '
+                            'Note that multiple (space-separated) flags must '
+                            'be surrounded by quotes, e.g. '
+                            '`--cflags="-DC1 -DC2"\' specifies flags to define '
+                            'the constants C1 and C2. Default: %(default)s')
+
+        parser.add_argument('-f', '--cflags', metavar='FLAGS',
+                            default=self.default_cflags,
+                            help='Like --cppflags, but the flags specified are '
+                            'only passed to compilations of C source files. '
+                            'Default: %(default)s')
+
+        parser.add_argument('-x', '--cxxflags', metavar='FLAGS',
+                            default=self.default_cxxflags,
+                            help='Like --cppflags, but the flags specified '
+                            'are only passed to compilations of C++ source '
+                            'files. Default: %(default)s')
+
+        parser.add_argument('-l', '--ldflags', metavar='FLAGS',
+                            default=self.default_ldflags,
+                            help='Like --cppflags, but the flags specified '
+                            'are only passed during the linking stage. Note '
+                            'these flags should be specified as if `ld\' were '
+                            'being invoked directly (i.e. the `-Wl,\' prefix '
+                            'should be omitted). Default: %(default)s')
+
         parser.add_argument('-v', '--verbose', default=False, action='store_true',
                             help='Verbose make output')
 
-    def discover(self):
+    def discover(self, args):
         self.e.find_arduino_dir('arduino_core_dir', 
                                 ['hardware', 'arduino', 'cores', 'arduino'], 
                                 ['Arduino.h'] if self.e.arduino_lib_version.major else ['WProgram.h'], 
@@ -61,10 +122,10 @@ class Build(Command):
                                     human_name='Arduino variants directory')
 
         toolset = [
-            ('cc', 'avr-gcc'),
-            ('cxx', 'avr-g++'),
-            ('ar', 'avr-ar'),
-            ('objcopy', 'avr-objcopy'),
+            ('cc', args.cc),
+            ('cxx', args.cxx),
+            ('ar', args.ar),
+            ('objcopy', args.objcopy),
         ]
 
         for tool_key, tool_binary in toolset:
@@ -72,33 +133,37 @@ class Build(Command):
                 tool_key, ['hardware', 'tools', 'avr', 'bin'], 
                 items=[tool_binary], human_name=tool_binary)
 
-    def setup_flags(self, board_key):
-        board = self.e.board_model(board_key)
+    def setup_flags(self, args):
+        board = self.e.board_model(args.board_model)
         mcu = '-mmcu=' + board['build']['mcu']
-        self.e['cflags'] = SpaceList([
+        # Hard-code the flags that are essential to building the sketch
+        self.e['cppflags'] = SpaceList([
             mcu,
-            '-ffunction-sections',
-            '-fdata-sections',
-            '-g',
-            '-Os', 
-            '-w',
             '-DF_CPU=' + board['build']['f_cpu'],
             '-DARDUINO=' + str(self.e.arduino_lib_version.as_int()),
             '-I' + self.e['arduino_core_dir'],
-        ])
+        ]) 
+        # Add additional flags as specified
+        self.e['cppflags'] += SpaceList(shlex.split(args.cppflags))
 
         if 'vid' in board['build']:
-            self.e['cflags'].append('-DUSB_VID=%s' % board['build']['vid'])
+            self.e['cppflags'].append('-DUSB_VID=%s' % board['build']['vid'])
         if 'pid' in board['build']:
-            self.e['cflags'].append('-DUSB_PID=%s' % board['build']['pid'])
+            self.e['cppflags'].append('-DUSB_PID=%s' % board['build']['pid'])
             
         if self.e.arduino_lib_version.major:
             variant_dir = os.path.join(self.e.arduino_variants_dir, 
                                        board['build']['variant'])
-            self.e.cflags.append('-I' + variant_dir)
+            self.e.cppflags.append('-I' + variant_dir)
 
-        self.e['cxxflags'] = SpaceList(['-fno-exceptions'])
-        self.e['elfflags'] = SpaceList(['-Os', '-Wl,--gc-sections', mcu])
+        self.e['cflags'] = SpaceList(shlex.split(args.cflags))
+        self.e['cxxflags'] = SpaceList(shlex.split(args.cxxflags))
+
+        # Again, hard-code the flags that are essential to building the sketch
+        self.e['ldflags'] = SpaceList([mcu])
+        self.e['ldflags'] += SpaceList([
+            '-Wl,' + flag for flag in shlex.split(args.ldflags)
+        ])
 
         self.e['names'] = {
             'obj': '%s.o',
@@ -199,11 +264,11 @@ class Build(Command):
                 scanned_libs.add(lib)
 
         self.e['used_libs'] = used_libs
-        self.e['cflags'].extend(self.recursive_inc_lib_flags(used_libs))
+        self.e['cppflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
     def run(self, args):
-        self.discover()
-        self.setup_flags(args.board_model)
+        self.discover(args)
+        self.setup_flags(args)
         self.create_jinja(verbose=args.verbose)
         self.make('Makefile.sketch')
         self.scan_dependencies()

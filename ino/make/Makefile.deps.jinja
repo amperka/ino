@@ -16,7 +16,7 @@
 {% for source, target in cpp.items() %}
 {{ target.path }} : {{ source.path }}
 	@mkdir -p {{ target.path|dirname }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@
+	{{v}}{{ e.cc }} {{ e.cppflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@
 	{# prepend build path to a target in the generated file and 
 	   add .d file itself as a target so that changes in a header file would rebuild dependency files
 	   See: http://make.paulandlesley.org/autodep.html #}
@@ -29,7 +29,7 @@
 {{ output_filepath }} : {{ cpp.target_paths() }}
 	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
 	@mkdir -p {{ output_filepath|dirname }}
-	{{v}}cat $^ > $@;
+	{{v}}{{ 'cat $^ >' if cpp.target_paths() else 'touch' }} $@;
 
 all : {{ output_filepath }}
 	@true
