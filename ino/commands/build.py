@@ -23,7 +23,7 @@ class Build(Command):
     Build a project in the current directory and produce a ready-to-upload
     firmware file.
 
-    The project is expected to have a `src' subdirectroy where all its sources
+    The project is expected to have a `src' subdirectory where all its sources
     are located. This directory is scanned recursively to find
     *.[c|cpp|pde|ino] files. They are compiled and linked into resulting
     firmware hex-file.
@@ -31,7 +31,7 @@ class Build(Command):
     Also any external library dependencies are tracked automatically. If a
     source file includes any library found among standard Arduino libraries or
     a library placed in `lib' subdirectory of the project, the library gets
-    build too.
+    built too.
 
     Build artifacts are placed in `.build' subdirectory of the project.
     """
