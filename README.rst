@@ -87,6 +87,7 @@ Contributors
 * `David Charbonnier <https://github.com/dcharbonnier>`_.
 * `Jared Boone <https://github.com/jboone>`_.
 * `Lars Englund <https://github.com/larsenglund>`_.
+* `Alberto Ruiz <https://github.com/aruiz>`_.
 
 Changelog
 =========
@@ -95,6 +96,8 @@ Changelog
     * Fix #74, #107, #108: Use of types declared in included files is allowed
       in function definitions. Previously it led to: '<enum|struct|typedef>' not
       declared in this scope.
+    * Fix #105: Search for `avrdude.conf` in `/etc/avrdude` to be compatible with
+      Fedora.
 
 0.3.5
     * Fix #62: Include `MIT-LICENSE.txt` in the tarball.

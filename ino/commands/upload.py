@@ -39,10 +39,10 @@ class Upload(Command):
         self.e.find_tool('stty', ['stty'])
         if platform.system() == 'Linux':
             self.e.find_arduino_tool('avrdude', ['hardware', 'tools'])
-            if os.path.exists('/etc/avrdude/avrdude.conf'):
-              self.e['avrdude.conf'] = '/etc/avrdude/avrdude.conf'
-            else:
-              self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools'])
+
+            conf_places = self.e.arduino_dist_places(['hardware', 'tools'])
+            conf_places.append('/etc/avrdude') # fallback to system-wide conf on Fedora
+            self.e.find_file('avrdude.conf', places=conf_places)
         else:
             self.e.find_arduino_tool('avrdude', ['hardware', 'tools', 'avr', 'bin'])
             self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools', 'avr', 'etc'])

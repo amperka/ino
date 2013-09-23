@@ -143,17 +143,17 @@ class Environment(dict):
         return self.find_file(key, items, places or ['$PATH'], human_name)
 
     def find_arduino_dir(self, key, dirname_parts, items=None, human_name=None):
-        return self.find_dir(key, items, self._arduino_dist_places(dirname_parts), human_name)
+        return self.find_dir(key, items, self.arduino_dist_places(dirname_parts), human_name)
 
     def find_arduino_file(self, key, dirname_parts, items=None, human_name=None):
-        return self.find_file(key, items, self._arduino_dist_places(dirname_parts), human_name)
+        return self.find_file(key, items, self.arduino_dist_places(dirname_parts), human_name)
 
     def find_arduino_tool(self, key, dirname_parts, items=None, human_name=None):
         # if not bundled with Arduino Software the tool should be searched on PATH
-        places = self._arduino_dist_places(dirname_parts) + ['$PATH']
+        places = self.arduino_dist_places(dirname_parts) + ['$PATH']
         return self.find_file(key, items, places, human_name)
 
-    def _arduino_dist_places(self, dirname_parts):
+    def arduino_dist_places(self, dirname_parts):
         """
         For `dirname_parts` like [a, b, c] return list of
         search paths within Arduino distribution directory like:
