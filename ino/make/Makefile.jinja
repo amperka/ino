@@ -15,11 +15,11 @@ include {{ target.path|depsname }}
 {% endmacro %}
 
 {% macro compile_c(filemap) %}
-{{ compile(filemap, e.cc ~ ' ' ~ e.cppflags ~ ' ' ~ e.cflags) }}
+{{ compile(filemap, e.cc ~ ' ' ~ e.compile_flags ~ ' ' ~ e.cflags) }}
 {% endmacro %}
 
 {% macro compile_cpp(filemap) %}
-{{ compile(filemap, e.cxx ~ ' ' ~ e.cppflags ~ ' ' ~ e.cxxflags) }}
+{{ compile(filemap, e.cxx ~ ' ' ~ e.compile_flags ~ ' ' ~ e.cxxflags) }}
 {% endmacro %}
 
 {#
