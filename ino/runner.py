@@ -70,9 +70,9 @@ def main():
                 os.makedirs(e.build_dir)
 
             if not os.path.isdir(e.lib_dir):
-                    os.makedirs(e.lib_dir)
-                    with open('lib/.holder', 'w') as f:
-                        f.write("")
+                os.makedirs(e.lib_dir)
+                with open('lib/.holder', 'w') as f:
+                    f.write("")
 
         args.func(args)
     except Abort as exc:
