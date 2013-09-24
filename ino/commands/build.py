@@ -46,7 +46,7 @@ class Build(Command):
     default_ar = 'avr-ar'
     default_objcopy = 'avr-objcopy'
 
-    default_compile_flags = '-ffunction-sections -fdata-sections -g -Os -w'
+    default_cppflags = '-ffunction-sections -fdata-sections -g -Os -w'
     default_cflags = ''
     default_cxxflags = '-fno-exceptions'
     default_ldflags = '-Os --gc-sections'
@@ -86,29 +86,29 @@ class Build(Command):
                             'is not given, searches in Arduino directories '
                             'before PATH. Default: "%(default)s".')
 
-        parser.add_argument('-f', '--compile-flags', metavar='FLAGS',
-                            default=self.default_compile_flags,
+        parser.add_argument('--cppflags', metavar='FLAGS',
+                            default=self.default_cppflags,
                             help='Flags that will be passed to the compiler. '
                             'Note that multiple (space-separated) flags must '
                             'be surrounded by quotes, e.g. '
-                            '`--compile-flags="-DC1 -DC2"\' specifies flags to define '
+                            '`--cflags="-DC1 -DC2"\' specifies flags to define '
                             'the constants C1 and C2. Default: "%(default)s".')
 
         parser.add_argument('--cflags', metavar='FLAGS',
                             default=self.default_cflags,
-                            help='Like --compile-flags, but the flags specified are '
+                            help='Like --cppflags, but the flags specified are '
                             'only passed to compilations of C source files. '
                             'Default: "%(default)s".')
 
         parser.add_argument('--cxxflags', metavar='FLAGS',
                             default=self.default_cxxflags,
-                            help='Like --compile-flags, but the flags specified '
+                            help='Like --cppflags, but the flags specified '
                             'are only passed to compilations of C++ source '
                             'files. Default: "%(default)s".')
 
         parser.add_argument('--ldflags', metavar='FLAGS',
                             default=self.default_ldflags,
-                            help='Like --compile-flags, but the flags specified '
+                            help='Like --cppflags, but the flags specified '
                             'are only passed during the linking stage. Note '
                             'these flags should be specified as if `ld\' were '
                             'being invoked directly (i.e. the `-Wl,\' prefix '
@@ -148,24 +148,24 @@ class Build(Command):
         board = self.e.board_model(args.board_model)
         mcu = '-mmcu=' + board['build']['mcu']
         # Hard-code the flags that are essential to building the sketch
-        self.e['compile_flags'] = SpaceList([
+        self.e['cppflags'] = SpaceList([
             mcu,
             '-DF_CPU=' + board['build']['f_cpu'],
             '-DARDUINO=' + str(self.e.arduino_lib_version.as_int()),
             '-I' + self.e['arduino_core_dir'],
         ]) 
         # Add additional flags as specified
-        self.e['compile_flags'] += SpaceList(shlex.split(args.compile_flags))
+        self.e['cppflags'] += SpaceList(shlex.split(args.cppflags))
 
         if 'vid' in board['build']:
-            self.e['compile_flags'].append('-DUSB_VID=%s' % board['build']['vid'])
+            self.e['cppflags'].append('-DUSB_VID=%s' % board['build']['vid'])
         if 'pid' in board['build']:
-            self.e['compile_flags'].append('-DUSB_PID=%s' % board['build']['pid'])
+            self.e['cppflags'].append('-DUSB_PID=%s' % board['build']['pid'])
             
         if self.e.arduino_lib_version.major:
             variant_dir = os.path.join(self.e.arduino_variants_dir, 
                                        board['build']['variant'])
-            self.e.compile_flags.append('-I' + variant_dir)
+            self.e.cppflags.append('-I' + variant_dir)
 
         self.e['cflags'] = SpaceList(shlex.split(args.cflags))
         self.e['cxxflags'] = SpaceList(shlex.split(args.cxxflags))
@@ -275,7 +275,7 @@ class Build(Command):
                 scanned_libs.add(lib)
 
         self.e['used_libs'] = used_libs
-        self.e['compile_flags'].extend(self.recursive_inc_lib_flags(used_libs))
+        self.e['cppflags'].extend(self.recursive_inc_lib_flags(used_libs))
 
     def run(self, args):
         self.discover(args)
