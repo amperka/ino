@@ -155,11 +155,39 @@ See MIT-LICENSE.txt in the distribution for details.</p>
 <ul class="simple">
 <li><a class="reference external" href="https://github.com/dcharbonnier">David Charbonnier</a>.</li>
 <li><a class="reference external" href="https://github.com/jboone">Jared Boone</a>.</li>
+<li><a class="reference external" href="https://github.com/larsenglund">Lars Englund</a>.</li>
+<li><a class="reference external" href="https://github.com/aruiz">Alberto Ruiz</a>.</li>
+<li><a class="reference external" href="https://github.com/12qu">12qu</a>.</li>
+<li><a class="reference external" href="https://github.com/gnusouth">Michael Sproul</a>.</li>
+<li><a class="reference external" href="https://github.com/Kernald">Marc Plano-Lesay</a>.</li>
+<li><a class="reference external" href="https://github.com/fabiankr">Fabian Kreiser</a>.</li>
 </ul>
 </div>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
+<dt>0.3.6</dt>
+<dd><ul class="first last simple">
+<li>Fix #74, #107, #108: Use of types declared in included files is allowed
+in function definitions. Previously it led to: &#8216;&lt;enum|struct|typedef&gt;&#8217; not
+declared in this scope.</li>
+<li>Fix #105: Search for <cite>avrdude.conf</cite> in <cite>/etc/avrdude</cite> to be compatible with
+Fedora.</li>
+<li>Fix #99: Check for an existing project before building or creating directories</li>
+<li>Fix #93, #57, #8: Custom compile and link flags can be passed as <cite>ino build</cite> arguments</li>
+<li>Fix #60, #63: Custom <cite>make</cite> tool command can be passed as <cite>ino build</cite> argument</li>
+<li>Fix #23, #28: <cite>make</cite> is searched within Arduino IDE binaries as well</li>
+<li>Fix #88, #103: Correct version parsing for some distributions that mangle it</li>
+<li>Fix #46: Taking build number into account in version string</li>
+<li>Fix #19, #81, #82: Custom command line arguments for <cite>picocom</cite> can be passed
+while running <cite>ino serial</cite></li>
+</ul>
+</dd>
+<dt>0.3.5</dt>
+<dd><ul class="first last simple">
+<li>Fix #62: Include <cite>MIT-LICENSE.txt</cite> in the tarball.</li>
+</ul>
+</dd>
 <dt>0.3.4</dt>
 <dd><ul class="first last simple">
 <li>Fix #44, #45: Building and uploading for Arduino Leonardo is fully supported.</li>
