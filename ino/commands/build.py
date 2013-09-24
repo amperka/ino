@@ -86,12 +86,12 @@ class Build(Command):
                             'is not given, searches in Arduino directories '
                             'before PATH. Default: "%(default)s".')
 
-        parser.add_argument('--cppflags', metavar='FLAGS',
+        parser.add_argument('-f', '--cppflags', metavar='FLAGS',
                             default=self.default_cppflags,
                             help='Flags that will be passed to the compiler. '
                             'Note that multiple (space-separated) flags must '
                             'be surrounded by quotes, e.g. '
-                            '`--cflags="-DC1 -DC2"\' specifies flags to define '
+                            '`--cppflags="-DC1 -DC2"\' specifies flags to define '
                             'the constants C1 and C2. Default: "%(default)s".')
 
         parser.add_argument('--cflags', metavar='FLAGS',
