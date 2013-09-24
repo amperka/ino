@@ -40,6 +40,7 @@ class Build(Command):
     name = 'build'
     help_line = "Build firmware from the current directory project"
 
+    default_make = 'make'
     default_cc = 'avr-gcc'
     default_cxx = 'avr-g++'
     default_ar = 'avr-ar'
@@ -54,6 +55,12 @@ class Build(Command):
         super(Build, self).setup_arg_parser(parser)
         self.e.add_board_model_arg(parser)
         self.e.add_arduino_dist_arg(parser)
+
+        parser.add_argument('--make', metavar='MAKE',
+                            default=self.default_make,
+                            help='Specifies the make tool to use. If '
+                            'a full path is not given, searches in Arduino '
+                            'directories before PATH. Default: "%(default)s".')
 
         parser.add_argument('--cc', metavar='COMPILER',
                             default=self.default_cc,
@@ -125,6 +132,7 @@ class Build(Command):
                                     human_name='Arduino variants directory')
 
         toolset = [
+            ('make', args.make),
             ('cc', args.cc),
             ('cxx', args.cxx),
             ('ar', args.ar),
@@ -203,7 +211,7 @@ class Build(Command):
 
     def make(self, makefile, **kwargs):
         makefile = self.render_template(makefile + '.jinja', makefile, **kwargs)
-        ret = subprocess.call(['make', '-f', makefile, 'all'])
+        ret = subprocess.call([self.e.make, '-f', makefile, 'all'])
         if ret != 0:
             raise Abort("Make failed with code %s" % ret)
 
