@@ -88,6 +88,8 @@ Contributors
 * `Jared Boone <https://github.com/jboone>`_.
 * `Lars Englund <https://github.com/larsenglund>`_.
 * `Alberto Ruiz <https://github.com/aruiz>`_.
+* `12qu <https://github.com/12qu>`_.
+* `Michael Sproul <https://github.com/gnusouth>`_.
 
 Changelog
 =========
@@ -98,6 +100,8 @@ Changelog
       declared in this scope.
     * Fix #105: Search for `avrdude.conf` in `/etc/avrdude` to be compatible with
       Fedora.
+    * Fix #99: Check for an existing project before building or creating directories
+    * Fix #93, #57, #8: Custom compile and link flags can be passed as `ino build` arguments
 
 0.3.5
     * Fix #62: Include `MIT-LICENSE.txt` in the tarball.
