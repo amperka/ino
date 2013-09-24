@@ -55,16 +55,15 @@ def main():
     args = parser.parse_args()
 
     try:
-        e.process_args(args)
-
-        # Create a .build directory if required
-        valid_project = os.path.isdir(e.src_dir)
         run_anywhere = "init clean list-models serial"
 
+        in_project_dir = os.path.isdir(e.src_dir)
+        if not in_project_dir and current_command not in run_anywhere:
+            raise Abort("No project found in this directory.")
+
+        e.process_args(args)
+
         if current_command not in run_anywhere:
-            if not valid_project:
-                raise Abort("No project found in this directory.")
-            
             # For valid projects create .build & lib
             if not os.path.isdir(e.build_dir):                
                 os.makedirs(e.build_dir)
