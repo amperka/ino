@@ -90,6 +90,8 @@ Contributors
 * `Alberto Ruiz <https://github.com/aruiz>`_.
 * `12qu <https://github.com/12qu>`_.
 * `Michael Sproul <https://github.com/gnusouth>`_.
+* `Marc Plano-Lesay <https://github.com/Kernald>`_.
+* `Fabian Kreiser <https://github.com/fabiankr>`_.
 
 Changelog
 =========
@@ -102,6 +104,8 @@ Changelog
       Fedora.
     * Fix #99: Check for an existing project before building or creating directories
     * Fix #93, #57, #8: Custom compile and link flags can be passed as `ino build` arguments
+    * Fix #60, #63: Custom `make` tool command can be passed as `ino build` argument
+    * Fix #23, #28: `make` is searched within Arduino IDE binaries as well
 
 0.3.5
     * Fix #62: Include `MIT-LICENSE.txt` in the tarball.
