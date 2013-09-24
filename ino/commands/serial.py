@@ -22,6 +22,10 @@ class Serial(Command):
                             help='Serial port to communicate with\nTry to guess if not specified')
         parser.add_argument('-b', '--baud-rate', metavar='RATE', type=int, default=9600, 
                             help='Communication baud rate, should match value set in Serial.begin() on Arduino')
+        parser.add_argument('remainder', nargs='*', metavar='ARGS',
+                            help='Extra picocom args that are passed as is')
+
+        parser.usage = "%(prog)s [-h] [-p PORT] [-b RATE] [-- ARGS]"
 
     def run(self, args):
         serial_monitor = self.e.find_tool('serial', ['picocom'], human_name='Serial monitor (picocom)')
@@ -31,5 +35,5 @@ class Serial(Command):
             serial_monitor,
             serial_port,
             '-b', str(args.baud_rate),
-            '-l',
-        ])
+            '-l'
+        ] + args.remainder)

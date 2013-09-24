@@ -108,6 +108,8 @@ Changelog
     * Fix #23, #28: `make` is searched within Arduino IDE binaries as well
     * Fix #88, #103: Correct version parsing for some distributions that mangle it
     * Fix #46: Taking build number into account in version string
+    * Fix #19, #81, #82: Custom command line arguments for `picocom` can be passed
+      while running `ino serial`
 
 0.3.5
     * Fix #62: Include `MIT-LICENSE.txt` in the tarball.
