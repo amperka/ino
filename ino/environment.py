@@ -124,6 +124,18 @@ class Environment(dict):
         return os.path.join(self.build_dir, self.hex_filename)
 
     def _find(self, key, items, places, human_name, join, multi):
+        """
+        Search for file-system entry with any name passed in `items` on
+        all paths provided in `places`. Use `key` as a cache key.
+
+        If `join` is True result will be a path join of place/item,
+        otherwise only place is taken as result.
+
+        Return first found match unless `multi` is True. In that case
+        a list with all fount matches is returned.
+
+        Raise `Abort` if no matches were found.
+        """
         if key in self:
             return self[key]
 
