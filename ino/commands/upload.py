@@ -83,8 +83,12 @@ class Upload(Command):
         # this wait a moment for the bootloader to enumerate. On Windows, also must
         # deal with the fact that the COM port number changes from bootloader to
         # sketch.
-        if board['bootloader']['path'] == "caterina":
-            caterina_port = None
+        touch_port = \
+                board['upload'].get('use_1200bps_touch') == 'true' or \
+                board['upload']['protocol'] == 'avr109'
+
+        if touch_port:
+            new_port = None
             before = self.e.list_serial_ports()
             if port in before:
                 ser = Serial()
@@ -106,20 +110,20 @@ class Upload(Command):
                 now = self.e.list_serial_ports()
                 diff = list(set(now) - set(before))
                 if diff:
-                    caterina_port = diff[0]
+                    new_port = diff[0]
                     break
 
                 before = now
                 sleep(enum_delay)
                 elapsed += enum_delay
 
-            if caterina_port == None:
-                raise Abort("Couldn’t find a Leonardo on the selected port. "
+            if not new_port:
+                raise Abort("Couldn’t find a board on the selected port. "
                             "Check that you have the correct port selected. "
                             "If it is correct, try pressing the board's reset "
                             "button after initiating the upload.")
 
-            port = caterina_port
+            port = new_port
 
         # call avrdude to upload .hex
         subprocess.call([
