@@ -347,5 +347,5 @@ class Environment(dict):
 
 class BoardModels(OrderedDict):
     def format(self):
-        map = [(key, val['name']) for key, val in self.iteritems()]
+        map = [(key, val['name']) for key, val in self.iteritems() if 'name' in val]
         return format_available_options(map, head_width=12, default=self.default)
