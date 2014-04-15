@@ -234,7 +234,7 @@ class Environment(dict):
                     #   yun.upload.maximum_data_size=2560
                     # into a nested dict `board_models` so that
                     #   self['board_models']['yun']['upload']['maximum_data_size'] == 2560
-                    multikey, val = line.split('=')
+                    multikey, _, val = line.partition('=')
                     multikey = multikey.split('.')
 
                     # traverse into dictionary up to deepest level
