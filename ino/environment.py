@@ -16,7 +16,7 @@ except ImportError:
     from ordereddict import OrderedDict
 
 from collections import namedtuple
-from glob import glob
+from glob2 import glob
 
 from ino.filters import colorize
 from ino.utils import format_available_options
@@ -123,7 +123,7 @@ class Environment(dict):
     def hex_path(self):
         return os.path.join(self.build_dir, self.hex_filename)
 
-    def _find(self, key, items, places, human_name, join):
+    def _find(self, key, items, places, human_name, join, multi):
         if key in self:
             return self[key]
 
@@ -133,39 +133,50 @@ class Environment(dict):
         places = itertools.chain.from_iterable(os.path.expandvars(p).split(os.pathsep) for p in places)
         places = map(os.path.expanduser, places)
 
+        glob_places = itertools.chain.from_iterable(glob(p) for p in places)
+        
         print 'Searching for', human_name, '...',
-        for p in places:
+        results = []
+        for p in glob_places:
             for i in items:
                 path = os.path.join(p, i)
                 if os.path.exists(path):
                     result = path if join else p
-                    print colorize(result, 'green')
-                    self[key] = result
-                    return result
+                    if not multi:
+                        print colorize(result, 'green')
+                        self[key] = result
+                        return result
+                    results.append(result)
+
+        if results:
+            formatted_results = ''.join(['\n  - ' + x for x in results])
+            print colorize('found multiple: %s' % formatted_results, 'green')
+            self[key] = results
+            return results
 
         print colorize('FAILED', 'red')
         raise Abort("%s not found. Searched in following places: %s" %
                     (human_name, ''.join(['\n  - ' + p for p in places])))
 
-    def find_dir(self, key, items, places, human_name=None):
-        return self._find(key, items or ['.'], places, human_name, join=False)
+    def find_dir(self, key, items, places, human_name=None, multi=False):
+        return self._find(key, items or ['.'], places, human_name, join=False, multi=multi)
 
-    def find_file(self, key, items=None, places=None, human_name=None):
-        return self._find(key, items or [key], places, human_name, join=True)
+    def find_file(self, key, items=None, places=None, human_name=None, multi=False):
+        return self._find(key, items or [key], places, human_name, join=True, multi=multi)
 
-    def find_tool(self, key, items, places=None, human_name=None):
-        return self.find_file(key, items, places or ['$PATH'], human_name)
+    def find_tool(self, key, items, places=None, human_name=None, multi=False):
+        return self.find_file(key, items, places or ['$PATH'], human_name, multi=multi)
 
-    def find_arduino_dir(self, key, dirname_parts, items=None, human_name=None):
-        return self.find_dir(key, items, self.arduino_dist_places(dirname_parts), human_name)
+    def find_arduino_dir(self, key, dirname_parts, items=None, human_name=None, multi=False):
+        return self.find_dir(key, items, self.arduino_dist_places(dirname_parts), human_name, multi=multi)
 
-    def find_arduino_file(self, key, dirname_parts, items=None, human_name=None):
-        return self.find_file(key, items, self.arduino_dist_places(dirname_parts), human_name)
+    def find_arduino_file(self, key, dirname_parts, items=None, human_name=None, multi=False):
+        return self.find_file(key, items, self.arduino_dist_places(dirname_parts), human_name, multi=multi)
 
-    def find_arduino_tool(self, key, dirname_parts, items=None, human_name=None):
+    def find_arduino_tool(self, key, dirname_parts, items=None, human_name=None, multi=False):
         # if not bundled with Arduino Software the tool should be searched on PATH
         places = self.arduino_dist_places(dirname_parts) + ['$PATH']
-        return self.find_file(key, items, places, human_name)
+        return self.find_file(key, items, places, human_name, multi=multi)
 
     def arduino_dist_places(self, dirname_parts):
         """
@@ -185,26 +196,53 @@ class Environment(dict):
         if 'board_models' in self:
             return self['board_models']
 
-        boards_txt = self.find_arduino_file('boards.txt', ['hardware', 'arduino'], 
-                                            human_name='Board description file (boards.txt)')
+        # boards.txt can be placed in following places
+        # - hardware/arduino/boards.txt (Arduino IDE 0.xx, 1.0.x)
+        # - hardware/arduino/{chipset}/boards.txt (Arduino 1.5.x, chipset like `avr`, `sam`)
+        # - hardware/{platform}/boards.txt (MPIDE 0.xx, platform like `arduino`, `pic32`)
+        # we should find and merge them all
+        boards_txts = self.find_arduino_file('boards.txt', ['hardware', '**'], 
+                                             human_name='Board description file (boards.txt)',
+                                             multi=True)
 
         self['board_models'] = BoardModels()
         self['board_models'].default = self.default_board_model
-        with open(boards_txt) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                multikey, val = line.split('=')
-                multikey = multikey.split('.')
+        for boards_txt in boards_txts:
+            with open(boards_txt) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
 
-                subdict = self['board_models']
-                for key in multikey[:-1]:
-                    if key not in subdict:
-                        subdict[key] = {}
-                    subdict = subdict[key]
+                    # Transform lines like:
+                    #   yun.upload.maximum_data_size=2560
+                    # into a nested dict `board_models` so that
+                    #   self['board_models']['yun']['upload']['maximum_data_size'] == 2560
+                    multikey, val = line.split('=')
+                    multikey = multikey.split('.')
 
-                subdict[multikey[-1]] = val
+                    # traverse into dictionary up to deepest level
+                    # create nested dictionaries if they aren't exist yet
+                    subdict = self['board_models']
+                    for key in multikey[:-1]:
+                        if key not in subdict:
+                            subdict[key] = {}
+                        elif not isinstance(subdict[key], dict):
+                            # it happens that a particular key
+                            # has a value and has sublevels at same time. E.g.:
+                            #   diecimila.menu.cpu.atmega168=ATmega168
+                            #   diecimila.menu.cpu.atmega168.upload.maximum_size=14336
+                            #   diecimila.menu.cpu.atmega168.upload.maximum_data_size=1024
+                            #   diecimila.menu.cpu.atmega168.upload.speed=19200
+                            # place value `ATmega168` into a special key `_` in such case
+                            subdict[key] = {'_': subdict[key]}
+                        subdict = subdict[key]
+
+                    subdict[multikey[-1]] = val
+
+                    # store spectial `_coredir` value on top level so we later can build
+                    # paths relative to a core directory of a specific board model
+                    self['board_models'][multikey[0]]['_coredir'] = os.path.dirname(boards_txt)
 
         return self['board_models']
 

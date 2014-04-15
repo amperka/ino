@@ -118,18 +118,20 @@ class Build(Command):
                             help='Verbose make output')
 
     def discover(self, args):
-        self.e.find_arduino_dir('arduino_core_dir', 
-                                ['hardware', 'arduino', 'cores', 'arduino'], 
-                                ['Arduino.h'] if self.e.arduino_lib_version.major else ['WProgram.h'], 
-                                'Arduino core library')
+        board = self.e.board_model(args.board_model)
+
+        core_place = os.path.join(board['_coredir'], 'cores', board['build']['core'])
+        core_header = 'Arduino.h' if self.e.arduino_lib_version.major else 'WProgram.h'
+        self.e.find_dir('arduino_core_dir', [core_header], [core_place],
+                        human_name='Arduino core library')
+
+        if self.e.arduino_lib_version.major:
+            variants_place = os.path.join(board['_coredir'], 'variants')
+            self.e.find_dir('arduino_variants_dir', ['.'], [variants_place],
+                            human_name='Arduino variants directory')
 
         self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],
                                 human_name='Arduino standard libraries')
-
-        if self.e.arduino_lib_version.major:
-            self.e.find_arduino_dir('arduino_variants_dir',
-                                    ['hardware', 'arduino', 'variants'],
-                                    human_name='Arduino variants directory')
 
         toolset = [
             ('make', args.make),
