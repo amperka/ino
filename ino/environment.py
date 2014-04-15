@@ -161,8 +161,12 @@ class Environment(dict):
                     results.append(result)
 
         if results:
-            formatted_results = ''.join(['\n  - ' + x for x in results])
-            print colorize('found multiple: %s' % formatted_results, 'green')
+            if len(results) > 1:
+                formatted_results = ''.join(['\n  - ' + x for x in results])
+                print colorize('found multiple: %s' % formatted_results, 'green')
+            else:
+                print colorize(results[0], 'green')
+
             self[key] = results
             return results
 
