@@ -3,3 +3,4 @@ pyserial
 configobj
 ordereddict
 argparse
+glob2
